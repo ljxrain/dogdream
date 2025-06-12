@@ -50,6 +50,9 @@
 	"/api/image-generation": [
 		"src/routes/api/image-generation/+server.ts"
 	],
+	"/api/volcano-cv": [
+		"src/routes/api/volcano-cv/+server.ts"
+	],
 	"/clear-storage": [],
 	"/dashboard": [],
 	"/emoji-master": [],
@@ -62,5 +65,6 @@
 	"/register": [],
 	"/shop": [],
 	"/showcase": [],
-	"/test-douban-api": []
+	"/test-douban-api": [],
+	"/test-volcano-cv": []
 }

@@ -388,8 +388,10 @@
                 </select>
                 <button
                   on:click={() => {
-                    const select = document.getElementById('newStatus') as HTMLSelectElement;
-                    updateOrderStatus(selectedOrder.id, select.value);
+                    const select = document.getElementById('newStatus');
+                    if (select && select instanceof HTMLSelectElement) {
+                      updateOrderStatus(selectedOrder.id, select.value);
+                    }
                   }}
                   class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg text-sm"
                 >

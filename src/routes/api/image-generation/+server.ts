@@ -113,12 +113,17 @@ export const POST: RequestHandler = async ({ request }) => {
 // Vision模型图片分析
 async function analyzeImageWithVision(imageUrl: string, targetStyle: string, fastMode: boolean = false): Promise<{success: boolean, analysis?: string, error?: string}> {
   try {
+    // 设置请求超时
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), fastMode ? 15000 : 30000); // 快速模式15秒，正常模式30秒
+
     const response = await fetch(DOUBAO_CONFIG.chatApiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${DOUBAO_CONFIG.apiKey}`
       },
+      signal: controller.signal,
       body: JSON.stringify({
         model: DOUBAO_CONFIG.visionModel,
         messages: [
@@ -128,7 +133,7 @@ async function analyzeImageWithVision(imageUrl: string, targetStyle: string, fas
               {
                 type: 'text',
                 text: fastMode ? 
-                  `快速分析：主体、场景、颜色。目标风格：${targetStyle}` :
+                  `快速分析图片的主要内容和${targetStyle}特征` :
                   `详细分析图片：主体对象、场景环境、色彩构成、构图特点。目标风格：${getStyleDescription(targetStyle)}。用于${targetStyle}风格转换。`
               },
               {
@@ -140,10 +145,12 @@ async function analyzeImageWithVision(imageUrl: string, targetStyle: string, fas
             ]
           }
         ],
-        max_tokens: fastMode ? 150 : 500,
-        temperature: fastMode ? 0.1 : 0.5
+        max_tokens: fastMode ? 100 : 300, // 进一步优化token数量
+        temperature: fastMode ? 0.1 : 0.3 // 降低温度提升速度
       })
     });
+
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -162,6 +169,9 @@ async function analyzeImageWithVision(imageUrl: string, targetStyle: string, fas
 
   } catch (error) {
     console.error('Vision分析错误:', error);
+    if (error instanceof Error && error.name === 'AbortError') {
+      return { success: false, error: '图片分析超时，请重试' };
+    }
     return { success: false, error: error instanceof Error ? error.message : '未知错误' };
   }
 }
@@ -198,25 +208,45 @@ function generateImagePrompt(analysis: string, style: string, userDescription: s
 
   const stylePrompt = stylePrompts[style] || 'artistic style';
   
-  // 根据快速模式调整prompt长度
-  const analysisLength = fastMode ? 150 : 300;
-  let finalPrompt = `${stylePrompt}. ${analysis.substring(0, analysisLength)}`;
-
-  if (userDescription.trim()) {
-    finalPrompt += `, ${userDescription}`;
+  // 构建prompt，优先级：用户描述 > 风格描述 > AI分析 > 质量要求
+  let promptParts = [];
+  
+  // 1. 用户描述放在最前面（最高优先级）
+  if (userDescription && userDescription.trim()) {
+    promptParts.push(userDescription.trim());
+    console.log('✅ 用户描述已添加到prompt:', userDescription.trim());
+  } else {
+    console.log('⚠️ 未提供用户描述');
+  }
+  
+  // 2. 风格描述
+  promptParts.push(stylePrompt);
+  
+  // 3. AI分析结果（截取适当长度）
+  const analysisLength = fastMode ? 80 : 150;
+  const truncatedAnalysis = analysis.substring(0, analysisLength);
+  if (truncatedAnalysis.trim()) {
+    promptParts.push(truncatedAnalysis.trim());
   }
 
-  // 根据质量添加质量提示
+  // 4. 质量要求
   if (quality === '高清' || quality === '超清') {
-    finalPrompt += ', high quality, detailed';
+    promptParts.push('high quality, detailed, masterpiece');
   }
 
+  const finalPrompt = promptParts.join(', ');
+  console.log('🎨 最终生成的prompt:', finalPrompt);
+  
   return finalPrompt;
 }
 
 // 文生图模型生成图片
 async function generateImageFromPrompt(prompt: string, quality: string, fastMode: boolean = false): Promise<{success: boolean, imageData?: string, error?: string}> {
   try {
+    // 设置请求超时
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), fastMode ? 30000 : 60000); // 快速模式30秒，正常模式60秒
+
     // 根据质量和快速模式确定分辨率
     let size = '512x512';
     if (!fastMode) {
@@ -230,6 +260,7 @@ async function generateImageFromPrompt(prompt: string, quality: string, fastMode
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${DOUBAO_CONFIG.apiKey}`
       },
+      signal: controller.signal,
       body: JSON.stringify({
         model: DOUBAO_CONFIG.imageGenModel,
         prompt: prompt,
@@ -239,6 +270,8 @@ async function generateImageFromPrompt(prompt: string, quality: string, fastMode
         quality: fastMode ? 'draft' : 'standard'
       })
     });
+
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -257,6 +290,9 @@ async function generateImageFromPrompt(prompt: string, quality: string, fastMode
 
   } catch (error) {
     console.error('文生图生成错误:', error);
+    if (error instanceof Error && error.name === 'AbortError') {
+      return { success: false, error: '图片生成超时，请重试' };
+    }
     return { success: false, error: error instanceof Error ? error.message : '未知错误' };
   }
 }

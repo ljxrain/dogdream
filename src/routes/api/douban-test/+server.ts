@@ -5,7 +5,14 @@ import type { RequestHandler } from './$types';
 const DOUBAO_CONFIG = {
   chatApiUrl: 'https://ark.cn-beijing.volces.com/api/v3/chat/completions',
   imageGenApiUrl: 'https://ark.cn-beijing.volces.com/api/v3/images/generations', // 文生图专用API
+  
+  // 使用新的豆包API密钥
+  accessKeyId: 'AKLTNDFmMDUwOGU1NTdlNDIyZDhmM2VhMWQ1YWY2MTE3YzQ',
+  secretAccessKey: 'TlRjeFpUUTROalExWXpVek5HVTVZemxpTTJZMVltWTFOVE5oTUdKa01USQ==',
+  
+  // 原有的apiKey作为备用
   apiKey: '97e3922f-c817-47d3-8690-6a940a06081f',
+  
   // 使用用户提供的接入点ID
   visionModel: 'ep-20250609024414-fwnn2', // 图片分析接入点ID
   imageGenModel: 'ep-m-20250609014544-4xckt' // 文生图接入点ID
