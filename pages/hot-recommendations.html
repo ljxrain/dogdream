@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>热门推荐 · 造梦家</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        body {
+            background-color: transparent;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+        }
+        .slide-container {
+            width: 100%;
+            height: calc(100vh - 110px);
+            position: relative;
+            overflow: hidden;
+        }
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.5s ease;
+        }
+        .slide.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .slide.previous {
+            transform: translateX(-100%);
+        }
+        .like-button:active {
+            transform: scale(1.2);
+        }
+        .nav-dots {
+            display: flex;
+            justify-content: center;
+            padding: 10px 0;
+        }
+        .nav-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #ccc;
+            margin: 0 5px;
+            transition: all 0.3s ease;
+        }
+        .nav-dot.active {
+            background-color: #4f46e5;
+            width: 20px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="no-scrollbar">
+    <div class="w-full h-full bg-white overflow-hidden relative">
+        <!-- iOS 状态栏 -->
+        <div class="pt-3 px-4 flex justify-between items-center h-10 bg-white">
+            <span class="text-xs font-semibold text-gray-700">9:41</span>
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-signal text-xs text-gray-700"></i>
+                <i class="fas fa-wifi text-xs text-gray-700"></i>
+                <i class="fas fa-battery-three-quarters text-xs text-gray-700"></i>
+            </div>
+        </div>
+        
+        <!-- 顶部导航栏 -->
+        <header class="px-4 py-3 bg-white border-b flex items-center justify-between">
+            <a href="hot-products-list.html" class="flex items-center text-gray-600">
+                <i class="fas fa-chevron-left mr-2"></i>
+                <span>返回列表</span>
+            </a>
+            <h1 class="text-lg font-bold text-gray-800">热门推荐</h1>
+            <button class="w-8 h-8 flex items-center justify-center">
+                <i class="fas fa-share-alt text-gray-600"></i>
+            </button>
+        </header>
+        
+        <!-- 幻灯片容器 -->
+        <div class="slide-container" id="slideContainer">
+            <!-- 幻灯片1 -->
+            <div class="slide active bg-gray-50">
+                <div class="p-4 h-full overflow-y-auto">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-bold text-gray-800">创意T恤</h2>
+                        <span class="text-sm text-gray-500">1/6</span>
+                    </div>
+                    
+                    <!-- 大图展示 -->
+                    <div class="w-full h-64 bg-white rounded-lg shadow-md overflow-hidden mb-4">
+                        <img src="https://images.unsplash.com/photo-1576566588028-4147f3842f27?q=80&w=600" alt="创意T恤" class="w-full h-full object-cover">
+                    </div>
+                    
+                    <!-- 用户信息 -->
+                    <div class="flex items-center mb-4">
+                        <div class="w-10 h-10 rounded-full overflow-hidden mr-3">
+                            <img src="https://randomuser.me/api/portraits/women/42.jpg" alt="用户头像" class="w-full h-full object-cover">
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-medium">李小梦</h3>
+                            <p class="text-xs text-gray-500">2天前创作</p>
+                        </div>
+                        <button class="ml-auto px-3 py-1 bg-indigo-100 text-indigo-600 rounded-full text-xs font-medium">
+                            + 关注
+                        </button>
+                    </div>
+                    
+                    <!-- 作品说明 -->
+                    <p class="text-sm text-gray-700 mb-4">我用AI生成了一幅梦幻星空图案，印在T恤上效果超赞！穿着去朋友聚会收获了无数羡慕的目光~</p>
+                    
+                    <!-- 标签 -->
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">#创意T恤</span>
+                        <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">#星空图案</span>
+                        <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">#AI生成</span>
+                    </div>
+                    
+                    <!-- 互动数据 -->
+                    <div class="flex items-center justify-between border-t border-b py-3 mb-4">
+                        <div class="flex items-center">
+                            <button class="like-button flex items-center mr-4 transition-transform duration-200">
+                                <i class="far fa-heart text-red-500 mr-1"></i>
+                                <span class="text-sm">1.2k</span>
+                            </button>
+                            <button class="flex items-center mr-4">
+                                <i class="far fa-comment text-gray-500 mr-1"></i>
+                                <span class="text-sm">89</span>
+                            </button>
+                            <button class="flex items-center">
+                                <i class="far fa-bookmark text-gray-500 mr-1"></i>
+                                <span class="text-sm">收藏</span>
+                            </button>
+                        </div>
+                        <button class="px-3 py-1 bg-indigo-600 text-white rounded-lg text-xs">
+                            我也要做
+                        </button>
+                    </div>
+                    
+                    <!-- 相关推荐 -->
+                    <h3 class="text-sm font-medium mb-3">相关推荐</h3>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-white rounded-lg overflow-hidden shadow-sm">
+                            <img src="https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?q=80&w=250" alt="相关T恤1" class="w-full h-24 object-cover">
+                            <div class="p-2">
+                                <p class="text-xs">银河系列T恤</p>
+                                <span class="text-xs text-red-600">¥69</span>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-lg overflow-hidden shadow-sm">
+                            <img src="https://images.unsplash.com/photo-1503342394128-c104d54dba01?q=80&w=250" alt="相关T恤2" class="w-full h-24 object-cover">
+                            <div class="p-2">
+                                <p class="text-xs">宇宙星云T恤</p>
+                                <span class="text-xs text-red-600">¥79</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 幻灯片2 -->
+            <div class="slide bg-gray-50">
+                <div class="p-4 h-full overflow-y-auto">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-bold text-gray-800">个性马克杯</h2>
+                        <span class="text-sm text-gray-500">2/6</span>
+                    </div>
+                    
+                    <!-- 大图展示 -->
+                    <div class="w-full h-64 bg-white rounded-lg shadow-md overflow-hidden mb-4">
+                        <img src="https://images.unsplash.com/photo-1541643600914-78b084683601?q=80&w=600" alt="个性马克杯" class="w-full h-full object-cover">
+                    </div>
+                    
+                    <!-- 用户信息 -->
+                    <div class="flex items-center mb-4">
+                        <div class="w-10 h-10 rounded-full overflow-hidden mr-3">
+                            <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="用户头像" class="w-full h-full object-cover">
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-medium">张创意</h3>
+                            <p class="text-xs text-gray-500">1周前创作</p>
+                        </div>
+                        <button class="ml-auto px-3 py-1 bg-indigo-100 text-indigo-600 rounded-full text-xs font-medium">
+                            + 关注
+                        </button>
+                    </div>
+                    
+                    <!-- 作品说明 -->
+                    <p class="text-sm text-gray-700 mb-4">给女朋友设计的定制马克杯，用我们的旅行照片生成了水彩风景画，每天喝水时都能回忆起美好的旅行记忆！</p>
+                    
+                    <!-- 标签 -->
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">#马克杯</span>
+                        <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">#水彩风景</span>
+                        <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">#情侣礼物</span>
+                    </div>
+                    
+                    <!-- 互动数据 -->
+                    <div class="flex items-center justify-between border-t border-b py-3 mb-4">
+                        <div class="flex items-center">
+                            <button class="like-button flex items-center mr-4 transition-transform duration-200">
+                                <i class="far fa-heart text-red-500 mr-1"></i>
+                                <span class="text-sm">865</span>
+                            </button>
+                            <button class="flex items-center mr-4">
+                                <i class="far fa-comment text-gray-500 mr-1"></i>
+                                <span class="text-sm">52</span>
+                            </button>
+                            <button class="flex items-center">
+                                <i class="far fa-bookmark text-gray-500 mr-1"></i>
+                                <span class="text-sm">收藏</span>
+                            </button>
+                        </div>
+                        <button class="px-3 py-1 bg-indigo-600 text-white rounded-lg text-xs">
+                            我也要做
+                        </button>
+                    </div>
+                    
+                    <!-- 相关推荐 -->
+                    <h3 class="text-sm font-medium mb-3">相关推荐</h3>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-white rounded-lg overflow-hidden shadow-sm">
+                            <img src="https://images.unsplash.com/photo-1557845661-1a1f3e8c988e?q=80&w=250" alt="相关杯子1" class="w-full h-24 object-cover">
+                            <div class="p-2">
+                                <p class="text-xs">双层陶瓷杯</p>
+                                <span class="text-xs text-red-600">¥59</span>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-lg overflow-hidden shadow-sm">
+                            <img src="https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?q=80&w=250" alt="相关杯子2" class="w-full h-24 object-cover">
+                            <div class="p-2">
+                                <p class="text-xs">情侣对杯</p>
+                                <span class="text-xs text-red-600">¥88</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 幻灯片3 -->
+            <div class="slide bg-gray-50">
+                <div class="p-4 h-full overflow-y-auto">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-bold text-gray-800">定制抱枕</h2>
+                        <span class="text-sm text-gray-500">3/6</span>
+                    </div>
+                    
+                    <!-- 大图展示 -->
+                    <div class="w-full h-64 bg-white rounded-lg shadow-md overflow-hidden mb-4">
+                        <img src="https://images.unsplash.com/photo-1567016520496-0cb4edbb4f15?q=80&w=600" alt="定制抱枕" class="w-full h-full object-cover">
+                    </div>
+                    
+                    <!-- 用户信息 -->
+                    <div class="flex items-center mb-4">
+                        <div class="w-10 h-10 rounded-full overflow-hidden mr-3">
+                            <img src="https://randomuser.me/api/portraits/women/15.jpg" alt="用户头像" class="w-full h-full object-cover">
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-medium">王小花</h3>
+                            <p class="text-xs text-gray-500">3天前创作</p>
+                        </div>
+                        <button class="ml-auto px-3 py-1 bg-indigo-100 text-indigo-600 rounded-full text-xs font-medium">
+                            + 关注
+                        </button>
+                    </div>
+                    
+                    <!-- 作品说明 -->
+                    <p class="text-sm text-gray-700 mb-4">把我家猫咪的照片做成了卡通风格的抱枕，质感特别好，猫咪自己也特别喜欢趴在上面睡觉，太可爱了！</p>
+                    
+                    <!-- 标签 -->
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">#定制抱枕</span>
+                        <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">#宠物周边</span>
+                        <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">#卡通风格</span>
+                    </div>
+                    
+                    <!-- 互动数据 -->
+                    <div class="flex items-center justify-between border-t border-b py-3 mb-4">
+                        <div class="flex items-center">
+                            <button class="like-button flex items-center mr-4 transition-transform duration-200">
+                                <i class="far fa-heart text-red-500 mr-1"></i>
+                                <span class="text-sm">933</span>
+                            </button>
+                            <button class="flex items-center mr-4">
+                                <i class="far fa-comment text-gray-500 mr-1"></i>
+                                <span class="text-sm">64</span>
+                            </button>
+                            <button class="flex items-center">
+                                <i class="far fa-bookmark text-gray-500 mr-1"></i>
+                                <span class="text-sm">收藏</span>
+                            </button>
+                        </div>
+                        <button class="px-3 py-1 bg-indigo-600 text-white rounded-lg text-xs">
+                            我也要做
+                        </button>
+                    </div>
+                    
+                    <!-- 相关推荐 -->
+                    <h3 class="text-sm font-medium mb-3">相关推荐</h3>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-white rounded-lg overflow-hidden shadow-sm">
+                            <img src="https://images.unsplash.com/photo-1591560893012-dac001678b7c?q=80&w=250" alt="相关抱枕1" class="w-full h-24 object-cover">
+                            <div class="p-2">
+                                <p class="text-xs">方形抱枕</p>
+                                <span class="text-xs text-red-600">¥39</span>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-lg overflow-hidden shadow-sm">
+                            <img src="https://images.unsplash.com/photo-1588093423037-19c6147d1ee1?q=80&w=250" alt="相关抱枕2" class="w-full h-24 object-cover">
+                            <div class="p-2">
+                                <p class="text-xs">靠垫套装</p>
+                                <span class="text-xs text-red-600">¥99</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 更多幻灯片可以继续添加... -->
+        </div>
+        
+        <!-- 导航点 -->
+        <div class="nav-dots" id="navDots">
+            <div class="nav-dot active" data-index="0"></div>
+            <div class="nav-dot" data-index="1"></div>
+            <div class="nav-dot" data-index="2"></div>
+            <div class="nav-dot" data-index="3"></div>
+            <div class="nav-dot" data-index="4"></div>
+            <div class="nav-dot" data-index="5"></div>
+        </div>
+        
+        <!-- 底部提示 -->
+        <div class="fixed bottom-0 left-0 right-0 bg-white border-t p-2 text-center text-xs text-gray-500">
+            左右滑动查看更多优秀作品
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const slideContainer = document.getElementById('slideContainer');
+            const slides = document.querySelectorAll('.slide');
+            const navDots = document.querySelectorAll('.nav-dot');
+            
+            let currentSlide = 0;
+            let startX, endX;
+            const threshold = 50; // 触发滑动的阈值
+            
+            // 检查URL参数，确定初始滑动页
+            function getURLParam(name) {
+                const urlParams = new URLSearchParams(window.location.search);
+                return urlParams.get(name);
+            }
+            
+            const initialSlide = getURLParam('slide');
+            if (initialSlide !== null) {
+                currentSlide = parseInt(initialSlide);
+            }
+            
+            // 更新点导航
+            function updateNavDots() {
+                navDots.forEach((dot, index) => {
+                    if (index === currentSlide) {
+                        dot.classList.add('active');
+                    } else {
+                        dot.classList.remove('active');
+                    }
+                });
+            }
+            
+            // 显示指定幻灯片
+            function showSlide(index) {
+                // 确保索引在有效范围内
+                if (index < 0) index = slides.length - 1;
+                if (index >= slides.length) index = 0;
+                
+                // 移除所有幻灯片的类
+                slides.forEach(slide => {
+                    slide.classList.remove('active', 'previous');
+                });
+                
+                // 设置当前幻灯片为活动
+                slides[index].classList.add('active');
+                
+                // 设置前一个幻灯片为previous
+                const prevIndex = (index - 1 + slides.length) % slides.length;
+                slides[prevIndex].classList.add('previous');
+                
+                currentSlide = index;
+                updateNavDots();
+            }
+            
+            // 触摸开始事件
+            slideContainer.addEventListener('touchstart', function(e) {
+                startX = e.touches[0].clientX;
+            });
+            
+            // 触摸结束事件
+            slideContainer.addEventListener('touchend', function(e) {
+                endX = e.changedTouches[0].clientX;
+                
+                // 计算滑动距离
+                const diffX = endX - startX;
+                
+                // 判断滑动方向
+                if (Math.abs(diffX) > threshold) {
+                    if (diffX > 0) {
+                        // 向右滑动，显示前一张
+                        showSlide(currentSlide - 1);
+                    } else {
+                        // 向左滑动，显示下一张
+                        showSlide(currentSlide + 1);
+                    }
+                }
+            });
+            
+            // 点击导航点切换幻灯片
+            navDots.forEach(dot => {
+                dot.addEventListener('click', function() {
+                    const index = parseInt(this.getAttribute('data-index'));
+                    showSlide(index);
+                });
+            });
+            
+            // 初始化
+            showSlide(0);
+            
+            // 点赞按钮效果
+            const likeButtons = document.querySelectorAll('.like-button');
+            likeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const icon = this.querySelector('i');
+                    if (icon.classList.contains('far')) {
+                        icon.classList.remove('far');
+                        icon.classList.add('fas');
+                        const countEl = this.querySelector('span');
+                        const count = parseInt(countEl.textContent);
+                        countEl.textContent = (count + 1).toString();
+                    } else {
+                        icon.classList.remove('fas');
+                        icon.classList.add('far');
+                        const countEl = this.querySelector('span');
+                        const count = parseInt(countEl.textContent);
+                        countEl.textContent = (count - 1).toString();
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html> 

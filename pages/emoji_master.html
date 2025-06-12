@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>表情包大师 · 造梦家</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        body {
+            background-color: transparent;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+        }
+        /* 用于独立预览时 */
+        .preview-container {
+            background-color: #e5e7eb;
+            display: none; /* 默认隐藏，仅在独立页面时显示 */
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        /* 场景滚动动画 */
+        @keyframes sceneScroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        /* 暂停动画当用户hover时 */
+        .animate-scroll:hover {
+            animation-play-state: paused;
+        }
+        /* 场景按钮式样 */
+        .scene-btn {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .scene-btn:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 2px;
+            background-color: #6366f1;
+            transition: width 0.3s ease;
+        }
+        .scene-btn:hover {
+            background-color: #eef2ff;
+        }
+        .scene-btn.active:after {
+            width: 70%;
+        }
+        /* 提示框样式改进 */
+        .tooltip {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .tooltip:after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 4px;
+            border-style: solid;
+            border-color: #1f2937 transparent transparent transparent;
+        }
+        /* 热门表情滚动动画 */
+        @keyframes hotStickerScroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+    </style>
+</head>
+<body class="no-scrollbar">
+    <!-- 预览容器，仅在独立页面时显示 -->
+    <div class="preview-container">
+        <!-- iPhone 模拟器框架 -->
+        <div class="mx-auto my-6 w-[393px] h-[852px] rounded-[40px] bg-white shadow-2xl overflow-hidden relative">
+            <!-- 内容将被JavaScript复制到这里 -->
+        </div>
+    </div>
+
+    <!-- iPhone 内容区域 - 在iframe中直接显示这部分 -->
+    <div class="w-full h-full bg-white overflow-hidden relative">
+        
+        <!-- iOS 状态栏 -->
+        <div class="pt-3 px-4 flex justify-between items-center h-10 bg-white">
+            <span class="text-xs font-semibold text-gray-700">9:41</span>
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-signal text-xs text-gray-700"></i>
+                <i class="fas fa-wifi text-xs text-gray-700"></i>
+                <i class="fas fa-battery-full text-xs text-gray-700"></i>
+            </div>
+        </div>
+        
+        <!-- 页面标题 -->
+        <header class="px-4 py-3 bg-white border-b">
+            <div class="flex items-center">
+                <a href="home.html" class="mr-2">
+                    <i class="fas fa-chevron-left text-gray-600"></i>
+                </a>
+                <div>
+                    <h1 class="text-lg font-bold text-gray-800">表情包大师</h1>
+                    <p class="text-xs text-gray-500">把照片一键变微信表情：静态 PNG / 动态 GIF</p>
+                </div>
+            </div>
+        </header>
+        
+        <!-- 主体滚动区域 -->
+        <main class="h-[calc(100%-90px)] overflow-y-auto px-4 py-3 bg-gray-50">
+            <div class="space-y-6 pb-16">
+                <!-- Step 1: 选择源图片 -->
+                <div class="space-y-2">
+                    <h2 class="text-sm font-semibold text-gray-700">Step 1: 选择源图片</h2>
+                    <div class="block w-full border-2 border-dashed border-gray-300 rounded-lg overflow-hidden">
+                        <!-- 选择区域 -->
+                        <div id="photoSelectArea" class="flex flex-col items-center justify-center h-36 bg-white">
+                            <i class="fas fa-image text-3xl text-gray-400 mb-2"></i>
+                            <p class="text-gray-500 text-sm mb-3">请选择要制作的图片</p>
+                            <div class="flex space-x-3">
+                                <button id="takePhotoBtn" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-xs flex items-center">
+                                    <i class="fas fa-camera mr-1"></i> 拍照
+                                </button>
+                                <label for="photoUpload" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg text-xs flex items-center cursor-pointer">
+                                    <i class="fas fa-folder-open mr-1"></i> 相册
+                                    <input type="file" accept="image/*" class="hidden" id="photoUpload">
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- 预览区域 -->
+                        <div id="photoPreviewArea" class="hidden">
+                            <div class="relative w-full h-36">
+                                <img id="selectedImage" class="w-full h-full object-contain" alt="已选择的照片">
+                                <button id="changePhotoBtn" class="absolute bottom-2 right-2 bg-black/50 text-white rounded-full w-8 h-8 flex items-center justify-center">
+                                    <i class="fas fa-camera"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Step 2: 场景与类型 -->
+                <div class="space-y-2">
+                    <h2 class="text-sm font-semibold text-gray-700">Step 2: 选择场景与类型</h2>
+                    
+                    <!-- 场景标签 -->
+                    <div class="mb-3">
+                        <p class="text-xs text-gray-500 mb-2">表情包场景</p>
+                        <div class="relative">
+                            <!-- 滑动指示器 -->
+                            <div class="absolute right-0 top-1/2 transform -translate-y-1/2 bg-gradient-to-l from-gray-50 via-gray-50/80 to-transparent w-12 h-36 flex items-center justify-center z-10 pointer-events-none">
+                                <i class="fas fa-chevron-right text-gray-400 animate-pulse"></i>
+                            </div>
+                            <!-- 场景滚动容器 -->
+                            <div id="sceneCarousel" class="flex overflow-x-auto no-scrollbar pb-2 snap-x animate-scroll" style="animation: sceneScroll 30s linear infinite;">
+                                <!-- 场景卡片将由JS动态注入 -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 表情类型 -->
+                    <div>
+                        <p class="text-xs text-gray-500 mb-2">表情类型</p>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button class="sticker-type-btn py-3 rounded-lg border border-indigo-500 text-xs text-center text-indigo-600 flex flex-col items-center justify-center" data-type="png">
+                                <i class="fas fa-image text-xl mb-1"></i>
+                                静态 PNG<br>单张图片
+                            </button>
+                            <button class="sticker-type-btn py-3 rounded-lg border border-gray-300 text-xs text-center text-gray-600 flex flex-col items-center justify-center" data-type="gif">
+                                <i class="fas fa-play-circle text-xl mb-1"></i>
+                                动态 GIF<br>连续帧动画
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Step 3: 风格与文字 -->
+                <div class="space-y-2">
+                    <h2 class="text-sm font-semibold text-gray-700">Step 3: 选择风格与文字</h2>
+                    
+                    <!-- 风格选择 -->
+                    <div class="mb-3">
+                        <p class="text-xs text-gray-500 mb-2">表情风格</p>
+                        <div class="relative">
+                            <!-- 滑动指示器 -->
+                            <div class="absolute right-0 top-10 bg-gradient-to-l from-gray-50 via-gray-50/80 to-transparent w-12 h-24 flex items-center justify-center z-10 pointer-events-none">
+                                <i class="fas fa-chevron-right text-gray-400 animate-pulse"></i>
+                            </div>
+                            
+                            <!-- 可滑动风格区域 -->
+                            <div id="styleContainer" class="overflow-x-auto no-scrollbar flex space-x-3 pb-3 snap-x snap-mandatory cursor-grab active:cursor-grabbing" style="scroll-behavior: smooth;">
+                                <!-- 风格卡片将由JS动态注入 -->
+                            </div>
+                            
+                            <!-- 滑动提示 -->
+                            <div class="flex items-center justify-center mt-2">
+                                <div class="flex space-x-1">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+                                    <span class="w-1.5 h-1.5 rounded-full bg-gray-300"></span>
+                                    <span class="w-1.5 h-1.5 rounded-full bg-gray-300"></span>
+                                </div>
+                                <span class="text-xs text-gray-500 ml-2">← 左右拖动查看更多风格 →</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 文字输入 -->
+                    <div>
+                        <p class="text-xs text-gray-500 mb-2">添加文字</p>
+                        <div class="relative mb-2">
+                            <input type="text" id="stickerText" placeholder="输入表情文字（可选）" class="w-full p-3 text-sm border border-gray-300 rounded-lg">
+                        </div>
+                        
+                        <!-- 特效选项 -->
+                        <div class="flex flex-wrap gap-3">
+                            <label class="flex items-center text-xs text-gray-700 cursor-pointer">
+                                <input type="checkbox" class="mr-1 text-indigo-600 rounded" id="outlineEffect">
+                                <span>描边字体</span>
+                            </label>
+                            <label class="flex items-center text-xs text-gray-700 cursor-pointer">
+                                <input type="checkbox" class="mr-1 text-indigo-600 rounded" id="explosionEffect">
+                                <span>爆炸贴纸</span>
+                            </label>
+                            <label class="flex items-center text-xs text-gray-700 cursor-pointer">
+                                <input type="checkbox" class="mr-1 text-indigo-600 rounded" id="shakeEffect">
+                                <span>抖动特效</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Step 4: 文字或语音描述 -->
+                <div class="space-y-2">
+                    <h2 class="text-sm font-semibold text-gray-700">Step 4: 文字或语音描述</h2>
+                    
+                    <!-- 描述输入区 -->
+                    <div class="space-y-3">
+                        <div class="border border-gray-300 rounded-lg overflow-hidden bg-white">
+                            <textarea id="descriptionText" rows="3" placeholder="描述你想要什么效果，例如：把我变成动漫角色，添加哭笑不得的表情，周围加上星星特效" class="w-full p-3 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 resize-none"></textarea>
+                            <div class="flex justify-between items-center p-2 border-t border-gray-200 bg-gray-50">
+                                <div class="flex items-center space-x-2">
+                                    <button id="emojiBtn" class="p-1.5 text-gray-500 hover:text-gray-700 rounded-full">
+                                        <i class="fas fa-smile"></i>
+                                    </button>
+                                    <button id="clearBtn" class="p-1.5 text-gray-500 hover:text-gray-700 rounded-full">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                <span class="text-xs text-gray-500">0/100</span>
+                            </div>
+                        </div>
+                        
+                        <!-- 语音输入 -->
+                        <button id="voiceInputBtn" class="w-full py-3 bg-white border border-gray-300 rounded-lg text-sm flex items-center justify-center space-x-2 transition-all hover:bg-gray-50 active:bg-gray-100 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1">
+                            <i class="fas fa-microphone text-indigo-600"></i>
+                            <span class="text-gray-700">按住说话，松开发送</span>
+                        </button>
+                        
+                        <!-- 示例描述 -->
+                        <div class="bg-gray-50 rounded-lg p-3">
+                            <p class="text-xs text-gray-500 mb-2">参考描述:</p>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button class="bg-white border border-gray-200 rounded-lg p-2 text-xs text-gray-700 text-left transition-all hover:bg-gray-50 hover:border-gray-300 active:bg-gray-100 active:scale-[0.99] focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                                    将人物放到日系动漫风格的校园场景中
+                                </button>
+                                <button class="bg-white border border-gray-200 rounded-lg p-2 text-xs text-gray-700 text-left transition-all hover:bg-gray-50 hover:border-gray-300 active:bg-gray-100 active:scale-[0.99] focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                                    添加可爱风格的猫耳朵和星星眼睛特效
+                                </button>
+                                <button class="bg-white border border-gray-200 rounded-lg p-2 text-xs text-gray-700 text-left transition-all hover:bg-gray-50 hover:border-gray-300 active:bg-gray-100 active:scale-[0.99] focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                                    设计成国潮风格，添加中国风元素
+                                </button>
+                                <button class="bg-white border border-gray-200 rounded-lg p-2 text-xs text-gray-700 text-left transition-all hover:bg-gray-50 hover:border-gray-300 active:bg-gray-100 active:scale-[0.99] focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                                    让人物做出疯狂摇头的动作，添加震惊表情
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Step 5: 生成与预览 -->
+                <div class="space-y-2">
+                    <h2 class="text-sm font-semibold text-gray-700">Step 5: 生成表情包</h2>
+                    
+                    <!-- 生成按钮 -->
+                    <button id="genBtn" class="w-full py-3 bg-indigo-600 text-white rounded-lg font-medium flex items-center justify-center transition-all hover:bg-indigo-700 active:bg-indigo-800 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                        <i class="fas fa-magic mr-2"></i>
+                        生成表情包
+                    </button>
+                    
+                    <!-- 预览区域 (默认隐藏) -->
+                    <div id="stickerPreview" class="hidden space-y-3 bg-white p-3 rounded-lg border border-gray-200">
+                        <!-- 加载动画 -->
+                        <div id="generatingLoader" class="py-6">
+                            <div class="flex flex-col items-center justify-center">
+                                <div class="relative w-16 h-16 mb-3">
+                                    <div class="absolute top-0 left-0 w-full h-full border-4 border-indigo-200 rounded-full"></div>
+                                    <div class="absolute top-0 left-0 w-full h-full border-4 border-transparent border-t-indigo-600 rounded-full animate-spin"></div>
+                                </div>
+                                <p class="text-sm text-gray-600 mb-1">AI正在生成表情包</p>
+                                <div id="progressText" class="text-xs text-gray-500">准备素材中...</div>
+                            </div>
+                        </div>
+                        
+                        <!-- 结果展示 -->
+                        <div id="resultDisplay" class="hidden">
+                            <div class="flex flex-col items-center justify-center">
+                                <!-- 表情包预览 -->
+                                <div class="relative w-full mb-4">
+                                    <div class="w-full aspect-square bg-gray-100 rounded-lg overflow-hidden border border-gray-200 mb-2">
+                                        <img id="previewSticker" class="w-full h-full object-contain" alt="生成的表情">
+                                    </div>
+                                    <div class="flex justify-center space-x-3">
+                                        <button id="previewPrev" class="p-2 bg-white border border-gray-300 rounded-full text-gray-700 disabled:opacity-30">
+                                            <i class="fas fa-chevron-left"></i>
+                                        </button>
+                                        <div class="flex items-center">
+                                            <span id="previewCurrent" class="font-medium text-sm">1</span>
+                                            <span class="text-gray-400 text-sm mx-1">/</span>
+                                            <span id="previewTotal" class="text-sm text-gray-600">3</span>
+                                        </div>
+                                        <button id="previewNext" class="p-2 bg-white border border-gray-300 rounded-full text-gray-700">
+                                            <i class="fas fa-chevron-right"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex w-full space-x-2">
+                                    <button id="regenerateBtn" class="flex-1 py-2 border border-indigo-500 text-indigo-600 rounded-lg text-sm font-medium transition-all hover:bg-indigo-50 active:bg-indigo-100 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1">
+                                        <i class="fas fa-sync-alt mr-1"></i> 重新生成
+                                    </button>
+                                    <button id="satisfiedBtn" class="flex-1 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium transition-all hover:bg-indigo-700 active:bg-indigo-800 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1">
+                                        <i class="fas fa-check mr-1"></i> 选择这个
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Step 6: 一键设置为微信表情包 -->
+                <div id="step6" class="space-y-2 opacity-60">
+                    <h2 class="text-sm font-semibold text-gray-700">Step 6: 一键设置为微信表情包</h2>
+                    
+                    <div class="bg-white border border-gray-200 rounded-lg p-4">
+                        <!-- 表情包设置区域 -->
+                        <div class="mb-4">
+                            <div class="flex items-center justify-between mb-3">
+                                <p class="text-xs text-gray-700 font-medium">表情名称</p>
+                                <span class="text-xs text-gray-500">0/9</span>
+                            </div>
+                            <div class="relative">
+                                <input type="text" id="stickerName" placeholder="给表情包起个名字" class="w-full p-3 text-sm border border-gray-300 rounded-lg" maxlength="9">
+                                <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-pen text-gray-400 text-xs"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 添加到表情分组 -->
+                        <div class="mb-4">
+                            <p class="text-xs text-gray-700 font-medium mb-3">添加到表情分组</p>
+                            <div class="grid grid-cols-4 gap-2">
+                                <div class="aspect-square bg-gray-100 rounded-lg flex flex-col items-center justify-center border-2 border-indigo-500 p-1">
+                                    <div class="w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center mb-1">
+                                        <i class="fas fa-smile text-indigo-600"></i>
+                                    </div>
+                                    <span class="text-xs text-gray-800 truncate w-full text-center">常用</span>
+                                </div>
+                                <div class="aspect-square bg-gray-100 rounded-lg flex flex-col items-center justify-center border border-gray-200 p-1">
+                                    <div class="w-10 h-10 rounded-lg bg-gray-200 flex items-center justify-center mb-1">
+                                        <i class="fas fa-paw text-gray-600"></i>
+                                    </div>
+                                    <span class="text-xs text-gray-800 truncate w-full text-center">萌宠</span>
+                                </div>
+                                <div class="aspect-square bg-gray-100 rounded-lg flex flex-col items-center justify-center border border-gray-200 p-1">
+                                    <div class="w-10 h-10 rounded-lg bg-gray-200 flex items-center justify-center mb-1">
+                                        <i class="fas fa-heart text-gray-600"></i>
+                                    </div>
+                                    <span class="text-xs text-gray-800 truncate w-full text-center">爱情</span>
+                                </div>
+                                <div class="aspect-square bg-gray-100 rounded-lg flex flex-col items-center justify-center border border-gray-200 p-1">
+                                    <div class="w-10 h-10 rounded-lg bg-gray-200 flex items-center justify-center mb-1">
+                                        <i class="fas fa-plus text-gray-600"></i>
+                                    </div>
+                                    <span class="text-xs text-gray-800 truncate w-full text-center">新建</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 表情包信息提示 -->
+                        <div class="p-3 bg-gray-50 rounded-lg mb-4">
+                            <div class="flex items-start">
+                                <i class="fas fa-info-circle text-indigo-600 mt-0.5 mr-2"></i>
+                                <div>
+                                    <p class="text-xs text-gray-700">表情包信息</p>
+                                    <p class="text-xs text-gray-500 mt-1">
+                                        格式：PNG 静态 | 尺寸：240×240px<br>
+                                        大小：<span id="fileSizeInfo">198 KB</span> | 符合微信表情包标准
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 导出按钮 -->
+                        <div class="space-y-3">
+                            <button id="wxExportBtn" class="w-full py-3 bg-green-500 text-white rounded-lg text-sm font-medium flex items-center justify-center">
+                                <i class="fab fa-weixin mr-2"></i> 一键导入微信表情
+                            </button>
+                            <div class="grid grid-cols-2 gap-3">
+                                <button id="saveLocalBtn" class="py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-medium">
+                                    <i class="fas fa-download mr-1"></i> 保存到手机
+                                </button>
+                                <button id="shareBtn" class="py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-medium">
+                                    <i class="fas fa-share-alt mr-1"></i> 分享
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 热门表情包 -->
+                <div class="space-y-2 mt-6">
+                    <h2 class="text-sm font-semibold text-gray-700">热门表情包</h2>
+                    <div class="relative">
+                        <!-- 滑动指示器 -->
+                        <div class="absolute right-0 top-1/2 transform -translate-y-1/2 bg-gradient-to-l from-gray-50 via-gray-50/80 to-transparent w-12 h-24 flex items-center justify-center z-10 pointer-events-none">
+                            <i class="fas fa-chevron-right text-gray-400 animate-pulse"></i>
+                        </div>
+                        <div id="hotStickerContainer" class="flex overflow-x-auto no-scrollbar pb-2 snap-x animate-scroll" style="animation: hotStickerScroll 20s linear infinite;">
+                            <div class="flex-shrink-0 w-24 h-24 bg-gray-200 rounded-lg overflow-hidden mx-1.5">
+                                <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="热门表情" class="w-full h-full object-cover">
+                            </div>
+                            <div class="flex-shrink-0 w-24 h-24 bg-gray-200 rounded-lg overflow-hidden mx-1.5">
+                                <img src="https://images.unsplash.com/photo-1517849845537-4d257902454a?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="热门表情" class="w-full h-full object-cover">
+                            </div>
+                            <div class="flex-shrink-0 w-24 h-24 bg-gray-200 rounded-lg overflow-hidden mx-1.5">
+                                <img src="https://images.unsplash.com/photo-1533738363-b7f9aef128ce?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="热门表情" class="w-full h-full object-cover">
+                            </div>
+                            <div class="flex-shrink-0 w-24 h-24 bg-gray-200 rounded-lg overflow-hidden mx-1.5">
+                                <img src="https://images.unsplash.com/photo-1527617442366-93806d8b8505?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="热门表情" class="w-full h-full object-cover">
+                            </div>
+                            <div class="flex-shrink-0 w-24 h-24 bg-gray-200 rounded-lg overflow-hidden mx-1.5">
+                                <img src="https://images.unsplash.com/photo-1568515045052-f9a854d70bfd?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="热门表情" class="w-full h-full object-cover">
+                            </div>
+                            <div class="flex-shrink-0 w-24 h-24 bg-gray-200 rounded-lg overflow-hidden mx-1.5">
+                                <img src="https://images.unsplash.com/photo-1578707905130-096cd7fce4bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="热门表情" class="w-full h-full object-cover">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 统一的底部导航栏 - 样式与index.html中完全相同 -->
+    <div id="unifiedBottomNav" class="h-[83px] bg-white border-t border-gray-200 flex justify-around items-center fixed bottom-0 left-0 right-0" style="display: none;">
+        <a href="home.html" class="flex flex-col items-center justify-center w-1/5 text-gray-400">
+            <i class="fas fa-home text-2xl mb-1"></i>
+            <span class="text-xs">首页</span>
+        </a>
+        <a href="works.html" class="flex flex-col items-center justify-center w-1/5 text-gray-400">
+            <i class="fas fa-compass text-2xl mb-1"></i>
+            <span class="text-xs">热门</span>
+        </a>
+        <a href="shop.html" class="flex flex-col items-center justify-center w-1/5 text-gray-400">
+            <i class="fas fa-store text-2xl mb-1"></i>
+            <span class="text-xs">商城</span>
+        </a>
+        <a href="me.html" class="flex flex-col items-center justify-center w-1/5 text-gray-400">
+            <i class="fas fa-user text-2xl mb-1"></i>
+            <span class="text-xs">我的</span>
+        </a>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 检测是否在iframe中加载
+            const isInIframe = window.self !== window.top;
+            const unifiedBottomNav = document.getElementById('unifiedBottomNav');
+            
+            // 如果不在iframe中，显示统一导航栏
+            if (!isInIframe && unifiedBottomNav) {
+                unifiedBottomNav.style.display = 'flex';
+                
+                // 配置导航点击事件
+                setupNavigation();
+            }
+            
+            // 设置导航栏点击事件处理函数
+            function setupNavigation() {
+                const navLinks = unifiedBottomNav.querySelectorAll('a');
+                
+                navLinks.forEach(link => {
+                    link.addEventListener('click', function(e) {
+                        // 阻止默认行为，手动处理导航
+                        e.preventDefault();
+                        
+                        // 获取目标页面
+                        const href = this.getAttribute('href');
+                        
+                        // 跳转到目标页面
+                        window.location.href = href;
+                    });
+                });
+            }
+
+            // 1. 动态注入场景卡片
+            const scenes = [
+                '基础情绪', // 笑哭、点赞、嫌弃、震惊等常用表达
+                '日常生活', // 早安/晚安、吃饭、摸鱼、加班、开会
+                '网络热梗', // 狗头、我裂开了、真香等梗图
+                '节日祝福', // 春节拜年、元宵、520、六一、圣诞
+                '爱情友情', // 比心、抱抱、飘爱心、想你了
+                '萌宠动物', // 沙雕猫狗、鸡鸭鹅，拟人动作
+                '方言文化', // 四川话"闹热"、东北话"杠杠滴"
+                '加油励志', // 加油、冲鸭、躺平、摸鱼×拒绝
+                '品牌IP' // LV、星巴克、腾讯官方IP
+            ];
+            const sceneDescriptions = {
+                '基础情绪': '笑哭、点赞、嫌弃、震惊等常用表达',
+                '日常生活': '早安/晚安、吃饭、摸鱼、加班、开会',
+                '网络热梗': '狗头、我裂开了、真香等梗图',
+                '节日祝福': '春节拜年、元宵、520、六一、圣诞',
+                '爱情友情': '比心、抱抱、飘爱心、想你了',
+                '萌宠动物': '沙雕猫狗、鸡鸭鹅，拟人动作',
+                '方言文化': '四川话"闹热"、东北话"杠杠滴"',
+                '加油励志': '加油、冲鸭、躺平、摸鱼×拒绝',
+                '品牌IP': 'LV、星巴克、腾讯官方IP'
+            };
+            
+            // 场景对应的图片和动图标记(是否是GIF)
+            const sceneImages = {
+                '基础情绪': [
+                    {url: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80', isGif: false},
+                    {url: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80', isGif: false},
+                    {url: 'https://images.unsplash.com/photo-1509909756405-be0199881695?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80', isGif: true}
+                ],
+                '日常生活': [
+                    {url: 'https://images.unsplash.com/photo-1517686469429-8bdb88b9f907?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80', isGif: false},
+                    {url: 'https://images.unsplash.com/photo-1550345332-09e3ac987658?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80', isGif: true},
+                    {url: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80', isGif: false}
+                ],
+                '网络热梗': [
+                    {url: 'https://images.unsplash.com/photo-1527980965255-d3b416303d12?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80', isGif: true},
+                    {url: 'https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80', isGif: false},
+                    {url: 'https://images.unsplash.com/photo-1575089976121-8ed7b2a54265?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80', isGif: false}
+                ],
+                '节日祝福': [
+                    {url: 'https://images.unsplash.com/photo-1513885535751-8b9238bd345a?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80', isGif: false},
+                    {url: 'https://images.unsplash.com/photo-1545048702-79362596cdc9?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80', isGif: false},
+                    {url: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80', isGif: true}
+                ],
+                '爱情友情': [
+                    {url: 'https://images.unsplash.com/photo-1518199266791-5375a83190b7?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80', isGif: false},
+                    {url: 'https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80', isGif: true},
+                    {url: 'https://images.unsplash.com/photo-1522627096082-5c10c9583c01?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80', isGif: false}
+                ],
+                '萌宠动物': [
+                    {url: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80', isGif: false},
+                    {url: 'https://images.unsplash.com/photo-1517849845537-4d257902454a?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80', isGif: true},
+                    {url: 'https://images.unsplash.com/photo-1533738363-b7f9aef128ce?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80', isGif: false}
+                ],
+                '方言文化': [
+                    {url: 'https://images.unsplash.com/photo-1568515045052-f9a854d70bfd?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80', isGif: false},
+                    {url: 'https://images.unsplash.com/photo-1578707905130-096cd7fce4bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80', isGif: false},
+                    {url: 'https://images.unsplash.com/photo-1564591111131-48a30129c7a3?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80', isGif: true}
+                ],
+                '加油励志': [
+                    {url: 'https://images.unsplash.com/photo-1531547255897-f400dc1b7de2?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80', isGif: true},
+                    {url: 'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80', isGif: false},
+                    {url: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80', isGif: false}
+                ],
+                '品牌IP': [
+                    {url: 'https://images.unsplash.com/photo-1561049501-e1f96bdd98fd?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80', isGif: false},
+                    {url: 'https://images.unsplash.com/photo-1577538928305-3807c3993047?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80', isGif: false},
+                    {url: 'https://images.unsplash.com/photo-1606938704652-3e588c2c9fd4?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80', isGif: true}
+                ]
+            };
+            
+            const sceneContainer = document.getElementById('sceneCarousel');
+            
+            // 为自动滚动效果，复制一份场景按钮
+            const sceneElements = [];
+            
+            scenes.forEach((scene, index) => {
+                // 创建完整的场景卡片，包含文字和图片
+                const card = document.createElement('div');
+                card.className = 'scene-card flex-shrink-0 mx-3 snap-start ' + 
+                    (index === 0 ? 'active' : '');
+                card.dataset.scene = scene;
+                
+                // 获取场景对应的图片
+                const sceneImgs = sceneImages[scene] || [];
+                
+                // 构建卡片HTML
+                card.innerHTML = `
+                    <div class="w-44 flex flex-col items-center">
+                        <button class="scene-btn relative whitespace-nowrap px-6 py-2 mb-2 rounded-full text-sm font-medium w-full text-center
+                            ${index === 0 ? 'bg-indigo-100 text-indigo-600' : 'bg-gray-100 text-gray-600'}">
+                            ${scene}
+                            <div class="tooltip absolute left-1/2 bottom-full mb-1 -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 pointer-events-none transition-opacity duration-200 whitespace-normal w-max max-w-[150px] z-20 hidden">
+                                ${sceneDescriptions[scene]}
+                            </div>
+                        </button>
+                        <div class="flex space-x-1 overflow-x-auto no-scrollbar">
+                            ${sceneImgs.map(img => `
+                                <div class="flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden${img.isGif ? ' relative' : ''}">
+                                    <img src="${img.url}" class="w-full h-full object-cover" alt="${scene}表情包">
+                                    ${img.isGif ? `
+                                        <div class="absolute inset-0 flex items-center justify-center">
+                                            <span class="bg-black/50 text-white text-xs px-1 py-0.5 rounded"><i class="fas fa-play"></i></span>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+                
+                // 添加点击事件
+                const sceneBtn = card.querySelector('.scene-btn');
+                const tooltip = card.querySelector('.tooltip');
+                
+                // 添加hover事件
+                sceneBtn.addEventListener('mouseenter', () => {
+                    tooltip.style.display = 'block';
+                    setTimeout(() => tooltip.classList.add('opacity-100'), 10);
+                });
+                sceneBtn.addEventListener('mouseleave', () => {
+                    tooltip.classList.remove('opacity-100');
+                    setTimeout(() => tooltip.style.display = 'none', 200);
+                });
+                
+                card.addEventListener('click', () => {
+                    toggleSceneActive(card);
+                });
+                
+                sceneElements.push(card);
+                sceneContainer.appendChild(card);
+            });
+            
+            // 复制卡片以实现无限滚动效果
+            sceneElements.forEach(card => {
+                const clone = card.cloneNode(true);
+                
+                // 重新添加事件监听器（cloneNode不会复制事件）
+                const sceneBtn = clone.querySelector('.scene-btn');
+                const tooltip = clone.querySelector('.tooltip');
+                
+                sceneBtn.addEventListener('mouseenter', () => {
+                    tooltip.style.display = 'block';
+                    setTimeout(() => tooltip.classList.add('opacity-100'), 10);
+                });
+                sceneBtn.addEventListener('mouseleave', () => {
+                    tooltip.classList.remove('opacity-100');
+                    setTimeout(() => tooltip.style.display = 'none', 200);
+                });
+                
+                clone.addEventListener('click', () => {
+                    toggleSceneActive(clone);
+                });
+                
+                sceneContainer.appendChild(clone);
+            });
+            
+            // 自动调整场景滚动速度，确保较长的场景列表有更好的滚动体验
+            const sceneScrollBar = document.getElementById('sceneCarousel');
+            const totalWidth = sceneScrollBar.scrollWidth / 2; // 除以2因为我们复制了一次
+            const animationDuration = Math.max(20, Math.min(40, totalWidth / 10)); // 根据内容宽度调整速度
+            sceneScrollBar.style.animationDuration = `${animationDuration}s`;
+            
+            // 3. 场景切换
+            function toggleSceneActive(activeCard) {
+                const sceneCards = document.querySelectorAll('.scene-card');
+                sceneCards.forEach(card => {
+                    card.classList.remove('active');
+                    const btn = card.querySelector('.scene-btn');
+                    btn.classList.remove('bg-indigo-100', 'text-indigo-600', 'active');
+                    btn.classList.add('bg-gray-100', 'text-gray-600');
+                });
+                
+                activeCard.classList.add('active');
+                const activeBtn = activeCard.querySelector('.scene-btn');
+                activeBtn.classList.remove('bg-gray-100', 'text-gray-600');
+                activeBtn.classList.add('bg-indigo-100', 'text-indigo-600', 'active');
+                
+                // 点击后滚动视图使选中卡片居中
+                const sceneBar = document.getElementById('sceneCarousel');
+                const cardRect = activeCard.getBoundingClientRect();
+                const barRect = sceneBar.getBoundingClientRect();
+                const centerOffset = (cardRect.left + cardRect.width/2) - (barRect.left + barRect.width/2);
+                
+                // 如果卡片不在中心位置，平滑滚动到中心
+                if (Math.abs(centerOffset) > 20) {
+                    // 暂停自动滚动
+                    sceneBar.style.animationPlayState = 'paused';
+                    // 平滑滚动到中心位置
+                    sceneBar.scrollBy({
+                        left: centerOffset,
+                        behavior: 'smooth'
+                    });
+                    // 滚动结束后恢复自动滚动
+                    setTimeout(() => {
+                        sceneBar.style.animationPlayState = 'running';
+                    }, 1000);
+                }
+            }
+            
+            // 2. 注入风格卡片
+            const styles = [
+                {name: '原图', image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'},
+                {name: '手绘', image: 'https://images.unsplash.com/photo-1536924940846-227afb31e2a5?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'},
+                {name: '像素', image: 'https://images.unsplash.com/photo-1608889335941-32ac5f2041b9?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'},
+                {name: '3D', image: 'https://images.unsplash.com/photo-1608889825103-eb5ed706fc64?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'},
+                {name: '国风水墨', image: 'https://images.unsplash.com/photo-1617503752587-97d2103a96ea?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'},
+                {name: '卡通', image: 'https://images.unsplash.com/photo-1560343776-97e7d202ff0e?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'},
+                {name: '油画', image: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'},
+                {name: '赛博朋克', image: 'https://images.unsplash.com/photo-1591035897819-f4bdf739f446?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'},
+                {name: '霓虹', image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'},
+                {name: '黑白', image: 'https://images.unsplash.com/photo-1473881823110-d94cac66318a?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'}
+            ];
+            
+            const styleContainer = document.getElementById('styleContainer');
+            
+            styles.forEach((style, index) => {
+                const styleCard = document.createElement('div');
+                styleCard.className = 'flex-shrink-0 w-28 snap-start';
+                styleCard.innerHTML = `
+                    <div class="w-28 h-24 bg-gray-200 rounded-lg overflow-hidden ${index === 0 ? 'border border-indigo-300' : ''}">
+                        <img src="${style.image}" alt="${style.name}" class="w-full h-full object-cover">
+                    </div>
+                    <p class="text-xs text-center mt-1 text-gray-700 ${index === 0 ? 'font-medium' : ''}">${style.name}</p>
+                `;
+                styleCard.addEventListener('click', () => toggleStyleActive(styleCard));
+                styleContainer.appendChild(styleCard);
+            });
+            
+            // 类型选择交互
+            const typeButtons = document.querySelectorAll('.sticker-type-btn');
+            typeButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    typeButtons.forEach(btn => {
+                        btn.classList.remove('border-indigo-500', 'text-indigo-600');
+                        btn.classList.add('border-gray-300', 'text-gray-600');
+                    });
+                    
+                    button.classList.remove('border-gray-300', 'text-gray-600');
+                    button.classList.add('border-indigo-500', 'text-indigo-600');
+                });
+            });
+            
+            // 5. 风格切换
+            function toggleStyleActive(activeCard) {
+                const styleCards = document.querySelectorAll('#styleContainer .flex-shrink-0');
+                styleCards.forEach(card => {
+                    const cardImage = card.querySelector('div');
+                    const cardText = card.querySelector('p');
+                    cardImage.classList.remove('border', 'border-indigo-300');
+                    cardText.classList.remove('font-medium');
+                });
+                
+                const cardImage = activeCard.querySelector('div');
+                const cardText = activeCard.querySelector('p');
+                cardImage.classList.add('border', 'border-indigo-300');
+                cardText.classList.add('font-medium');
+            }
+            
+            // 风格选择区域鼠标拖动支持
+            const styleSlider = document.querySelector('#styleContainer');
+            let isDown = false;
+            let startX;
+            let scrollLeft;
+
+            styleSlider.addEventListener('mousedown', (e) => {
+                isDown = true;
+                styleSlider.classList.add('cursor-grabbing');
+                startX = e.pageX - styleSlider.offsetLeft;
+                scrollLeft = styleSlider.scrollLeft;
+            });
+
+            styleSlider.addEventListener('mouseleave', () => {
+                isDown = false;
+                styleSlider.classList.remove('cursor-grabbing');
+            });
+
+            styleSlider.addEventListener('mouseup', () => {
+                isDown = false;
+                styleSlider.classList.remove('cursor-grabbing');
+            });
+
+            styleSlider.addEventListener('mousemove', (e) => {
+                if (!isDown) return;
+                e.preventDefault();
+                const x = e.pageX - styleSlider.offsetLeft;
+                const walk = (x - startX) * 2; // 滚动速度
+                styleSlider.scrollLeft = scrollLeft - walk;
+            });
+            
+            // 照片选择交互
+            const photoUpload = document.getElementById('photoUpload');
+            const photoSelectArea = document.getElementById('photoSelectArea');
+            const photoPreviewArea = document.getElementById('photoPreviewArea');
+            const selectedImage = document.getElementById('selectedImage');
+            const takePhotoBtn = document.getElementById('takePhotoBtn');
+            const changePhotoBtn = document.getElementById('changePhotoBtn');
+            
+            // 处理文件选择
+            photoUpload.addEventListener('change', function(e) {
+                if (this.files && this.files[0]) {
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(e) {
+                        selectedImage.src = e.target.result;
+                        photoSelectArea.classList.add('hidden');
+                        photoPreviewArea.classList.remove('hidden');
+                    };
+                    
+                    reader.readAsDataURL(this.files[0]);
+                }
+            });
+            
+            // 处理拍照按钮点击
+            takePhotoBtn.addEventListener('click', function() {
+                // 创建一个临时的文件输入元素，指定capture为camera
+                const tempInput = document.createElement('input');
+                tempInput.type = 'file';
+                tempInput.accept = 'image/*';
+                tempInput.capture = 'camera'; // 指定使用相机
+                
+                // 监听change事件
+                tempInput.addEventListener('change', function(e) {
+                    if (this.files && this.files[0]) {
+                        const reader = new FileReader();
+                        
+                        reader.onload = function(e) {
+                            selectedImage.src = e.target.result;
+                            photoSelectArea.classList.add('hidden');
+                            photoPreviewArea.classList.remove('hidden');
+                        };
+                        
+                        reader.readAsDataURL(this.files[0]);
+                    }
+                });
+                
+                // 模拟点击打开相机
+                tempInput.click();
+            });
+            
+            // 更换照片按钮
+            changePhotoBtn.addEventListener('click', function() {
+                photoPreviewArea.classList.add('hidden');
+                photoSelectArea.classList.remove('hidden');
+            });
+            
+            // 生成表情包交互
+            const genBtn = document.getElementById('genBtn');
+            const stickerPreview = document.getElementById('stickerPreview');
+            const previewSticker = document.getElementById('previewSticker');
+            const regenerateBtn = document.getElementById('regenerateBtn');
+            const satisfiedBtn = document.getElementById('satisfiedBtn');
+            const generatingLoader = document.getElementById('generatingLoader');
+            const resultDisplay = document.getElementById('resultDisplay');
+            const progressText = document.getElementById('progressText');
+            const step6 = document.getElementById('step6');
+            const previewPrev = document.getElementById('previewPrev');
+            const previewNext = document.getElementById('previewNext');
+            const previewCurrent = document.getElementById('previewCurrent');
+            const previewTotal = document.getElementById('previewTotal');
+            
+            // 模拟生成的表情包数组
+            const generatedStickers = [
+                'https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+                'https://images.unsplash.com/photo-1517849845537-4d257902454a?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+                'https://images.unsplash.com/photo-1533738363-b7f9aef128ce?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'
+            ];
+            let currentPreviewIndex = 0;
+            
+            // 表情预览导航
+            function updatePreviewNavigation() {
+                previewCurrent.textContent = currentPreviewIndex + 1;
+                previewTotal.textContent = generatedStickers.length;
+                previewPrev.disabled = currentPreviewIndex === 0;
+                previewNext.disabled = currentPreviewIndex === generatedStickers.length - 1;
+                
+                // 更新预览图片
+                previewSticker.src = generatedStickers[currentPreviewIndex];
+            }
+            
+            previewNext.addEventListener('click', function() {
+                if (currentPreviewIndex < generatedStickers.length - 1) {
+                    currentPreviewIndex++;
+                    updatePreviewNavigation();
+                }
+            });
+            
+            previewPrev.addEventListener('click', function() {
+                if (currentPreviewIndex > 0) {
+                    currentPreviewIndex--;
+                    updatePreviewNavigation();
+                }
+            });
+            
+            genBtn.addEventListener('click', function() {
+                // 检查是否已选择图片
+                if (photoSelectArea.classList.contains('hidden')) {
+                    // 视觉反馈 - 按钮变化
+                    this.classList.add('bg-indigo-700');
+                    this.classList.add('scale-[0.98]');
+                    
+                    // 显示生成中状态
+                    stickerPreview.classList.remove('hidden');
+                    generatingLoader.classList.remove('hidden');
+                    resultDisplay.classList.add('hidden');
+                    
+                    // 更新按钮状态
+                    this.disabled = true;
+                    this.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> 生成中...';
+                    
+                    // 模拟生成过程
+                    let progress = 0;
+                    const progressSteps = [
+                        '准备素材中...',
+                        '分析图片内容...',
+                        '应用风格转换...',
+                        '添加表情特效...',
+                        '优化表情尺寸...',
+                        '生成表情包完成!'
+                    ];
+                    
+                    const progressInterval = setInterval(() => {
+                        progressText.textContent = progressSteps[progress];
+                        progress++;
+                        
+                        if (progress >= progressSteps.length) {
+                            clearInterval(progressInterval);
+                            
+                            // 显示结果
+                            setTimeout(() => {
+                                generatingLoader.classList.add('hidden');
+                                resultDisplay.classList.remove('hidden');
+                                
+                                // 恢复按钮状态
+                                genBtn.disabled = false;
+                                genBtn.classList.remove('bg-indigo-700', 'scale-[0.98]');
+                                genBtn.innerHTML = '<i class="fas fa-magic mr-2"></i> 重新生成';
+                                
+                                // 初始化预览导航
+                                currentPreviewIndex = 0;
+                                updatePreviewNavigation();
+                                
+                                // 启用Step 6 - 去除淡色效果
+                                document.getElementById('step6').classList.remove('opacity-60');
+                                
+                                // 滚动到预览区域
+                                stickerPreview.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            }, 500);
+                        }
+                    }, 800);
+                } else {
+                    alert('请先选择一张图片');
+                }
+            });
+            
+            // 再调整按钮
+            regenerateBtn.addEventListener('click', function() {
+                stickerPreview.classList.add('hidden');
+                
+                // 重置Step 6状态（添加淡色效果）
+                document.getElementById('step6').classList.add('opacity-60');
+                
+                // 修改：滚动到Step 4而非Step 3
+                document.querySelector('h2:nth-of-type(4)').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+            
+            // 满意按钮 - 无需显示Step 6，因为已经默认显示了
+            satisfiedBtn.addEventListener('click', function() {
+                // 滚动到Step 6
+                document.querySelector('h2:nth-of-type(6)').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+            
+            // 处理微信表情名称输入
+            const stickerName = document.getElementById('stickerName');
+            const nameCounter = stickerName.parentElement.previousElementSibling.querySelector('span');
+            
+            stickerName.addEventListener('input', function() {
+                const count = this.value.length;
+                nameCounter.textContent = `${count}/9`;
+                
+                if (count > 0) {
+                    this.classList.add('border-indigo-500');
+                } else {
+                    this.classList.remove('border-indigo-500');
+                }
+            });
+            
+            // 微信导出按钮
+            const wxExportBtn = document.getElementById('wxExportBtn');
+            wxExportBtn.classList.add('transition-all', 'hover:bg-green-600', 'active:bg-green-700', 'active:scale-[0.98]', 'focus:outline-none', 'focus:ring-2', 'focus:ring-green-500', 'focus:ring-offset-1');
+            
+            wxExportBtn.addEventListener('click', function() {
+                // 检查是否已生成表情包
+                if (document.getElementById('step6').classList.contains('opacity-60')) {
+                    alert('请先生成表情包');
+                    document.querySelector('h2:nth-of-type(5)').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    return;
+                }
+                
+                if (!stickerName.value.trim()) {
+                    alert('请先给表情包起个名字');
+                    stickerName.focus();
+                    return;
+                }
+                
+                // 模拟导出过程
+                this.disabled = true;
+                this.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> 导入中...';
+                
+                setTimeout(() => {
+                    // 恢复按钮状态
+                    this.disabled = false;
+                    this.innerHTML = '<i class="fas fa-check mr-2"></i> 导入成功';
+                    this.classList.remove('bg-green-500');
+                    this.classList.add('bg-green-600');
+                    
+                    // 提示成功
+                    setTimeout(() => {
+                        alert('表情包已成功导入微信，可在微信聊天界面使用');
+                        
+                        // 恢复原始状态
+                        this.innerHTML = '<i class="fab fa-weixin mr-2"></i> 一键导入微信表情';
+                        this.classList.remove('bg-green-600');
+                        this.classList.add('bg-green-500');
+                    }, 1500);
+                }, 2000);
+            });
+            
+            // 热门表情自动滚动
+            const hotStickerContainer = document.getElementById('hotStickerContainer');
+            
+            // 复制表情以实现无限滚动
+            const originalStickers = hotStickerContainer.innerHTML;
+            hotStickerContainer.innerHTML += originalStickers;
+            
+            // 暂停和恢复滚动
+            hotStickerContainer.addEventListener('mouseenter', function() {
+                this.style.animationPlayState = 'paused';
+            });
+            
+            hotStickerContainer.addEventListener('mouseleave', function() {
+                this.style.animationPlayState = 'running';
+            });
+            
+            // 文字描述计数功能
+            const descriptionText = document.getElementById('descriptionText');
+            const charCount = descriptionText.nextElementSibling.querySelector('span');
+            
+            descriptionText.addEventListener('input', function() {
+                const count = this.value.length;
+                charCount.textContent = `${count}/100`;
+                
+                // 超出字数限制时
+                if (count > 100) {
+                    charCount.classList.add('text-red-500');
+                    this.value = this.value.substring(0, 100);
+                    charCount.textContent = '100/100';
+                } else {
+                    charCount.classList.remove('text-red-500');
+                }
+            });
+            
+            // 清除按钮功能
+            const clearBtn = document.getElementById('clearBtn');
+            clearBtn.addEventListener('click', function() {
+                descriptionText.value = '';
+                charCount.textContent = '0/100';
+            });
+            
+            // 语音输入按钮
+            const voiceInputBtn = document.getElementById('voiceInputBtn');
+            let isRecording = false;
+            
+            voiceInputBtn.addEventListener('mousedown', function() {
+                // 开始录音UI反馈
+                this.classList.remove('bg-white', 'hover:bg-gray-50');
+                this.classList.add('bg-indigo-50');
+                this.querySelector('span').textContent = '正在录音...';
+                this.querySelector('i').classList.add('text-red-500', 'animate-pulse');
+                isRecording = true;
+                
+                // 这里应该添加实际的录音逻辑
+                // 微信小程序中可使用wx.startRecord()
+                // 但在HTML预览中我们只模拟UI交互
+            });
+            
+            voiceInputBtn.addEventListener('mouseup', function() {
+                if (isRecording) {
+                    // 结束录音UI反馈
+                    this.classList.remove('bg-indigo-50');
+                    this.classList.add('bg-white');
+                    this.querySelector('span').textContent = '按住说话，松开发送';
+                    this.querySelector('i').classList.remove('text-red-500', 'animate-pulse');
+                    
+                    // 模拟录音结果
+                    descriptionText.value = '这是通过语音识别生成的文字';
+                    descriptionText.dispatchEvent(new Event('input'));
+                    isRecording = false;
+                }
+            });
+            
+            // 示例描述按钮点击
+            const exampleBtns = document.querySelectorAll('.grid button');
+            exampleBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    descriptionText.value = this.textContent.trim();
+                    descriptionText.dispatchEvent(new Event('input'));
+                });
+            });
+        });
+    </script>
+</body>
+</html> 

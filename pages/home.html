@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>造梦家 - 首页</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #f8f8f8;
+            padding-top: 44px; /* 为状态栏预留空间 */
+            padding-bottom: 70px; /* 修复底部遮挡问题 */
+            overflow-y: auto;
+        }
+        .feature-card {
+            transition: transform 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .feature-card:active {
+            transform: scale(0.98);
+        }
+        .banner-container {
+            height: 180px;
+            overflow: hidden;
+            position: relative;
+        }
+        .banner-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+        .banner-slide.active {
+            opacity: 1;
+        }
+        .banner-pagination {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 6px;
+        }
+        .banner-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.6);
+        }
+        .banner-dot.active {
+            background-color: white;
+        }
+        .feature-item {
+            height: 160px;
+            position: relative;
+        }
+        .feature-item img {
+            transition: transform 0.5s ease;
+        }
+        .feature-item:active img {
+            transform: scale(1.05);
+        }
+        .discover-card {
+            transition: transform 0.3s ease;
+        }
+        .discover-card:active {
+            transform: scale(0.98);
+        }
+        
+        /* 胶片效果动画 */
+        .animate-filmstrip {
+            animation: filmstrip 30s linear infinite;
+        }
+        @keyframes filmstrip {
+            0% {
+                transform: translateX(0);
+            }
+            100% {
+                transform: translateX(-50%);
+            }
+        }
+        
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- 页面头部 -->
+    <header class="bg-white px-4 py-3 flex items-center justify-between sticky top-0 z-10 shadow-sm">
+        <h1 class="text-xl font-bold text-gray-800">造梦家</h1>
+        <div class="flex items-center space-x-3">
+            <button class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100">
+                <i class="fas fa-bell text-gray-600"></i>
+            </button>
+            <button class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100">
+                <i class="fas fa-search text-gray-600"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- 轮播图 -->
+    <div class="banner-container relative">
+        <div class="banner-slide active">
+            <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="漫画人物" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-gradient-to-b from-transparent to-black/50 flex flex-col justify-end p-4">
+                <h3 class="text-white text-lg font-bold">一键变成梦想中的漫画人物</h3>
+                <p class="text-white text-sm opacity-90">AI智能转换，让你秒变动漫达人</p>
+            </div>
+        </div>
+        <div class="banner-slide">
+            <img src="https://images.unsplash.com/photo-1494774157365-9e04c6720e47?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="爱情记忆" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-gradient-to-b from-transparent to-black/50 flex flex-col justify-end p-4">
+                <h3 class="text-white text-lg font-bold">一键纪念我们的爱情</h3>
+                <p class="text-white text-sm opacity-90">将美好回忆转化为艺术品，留住幸福时刻</p>
+            </div>
+        </div>
+        <div class="banner-slide">
+            <img src="https://images.unsplash.com/photo-1518754774392-2022d76dcd16?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="宝宝成长" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-gradient-to-b from-transparent to-black/50 flex flex-col justify-end p-4">
+                <h3 class="text-white text-lg font-bold">一键记录宝宝的成长历程</h3>
+                <p class="text-white text-sm opacity-90">捕捉每一个精彩瞬间，创造独特成长故事</p>
+            </div>
+        </div>
+        <div class="banner-slide">
+            <img src="https://images.unsplash.com/photo-1527980965255-d3b416303d12?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="表情包" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-gradient-to-b from-transparent to-black/50 flex flex-col justify-end p-4">
+                <h3 class="text-white text-lg font-bold">一键生成我的表情包</h3>
+                <p class="text-white text-sm opacity-90">打造专属表情，聊天社交更有趣</p>
+            </div>
+        </div>
+        <div class="banner-pagination">
+            <div class="banner-dot active"></div>
+            <div class="banner-dot"></div>
+            <div class="banner-dot"></div>
+            <div class="banner-dot"></div>
+        </div>
+    </div>
+
+    <!-- 核心功能4宫格 -->
+    <div class="p-4">
+        <h2 class="text-lg font-bold text-gray-800 mb-3">创作中心</h2>
+        <div class="grid grid-cols-2 gap-3">
+            <!-- 照片圆梦 -->
+            <a href="photo-to-image.html" class="feature-item bg-white rounded-xl overflow-hidden shadow-md">
+                <div class="relative h-full">
+                    <img src="https://images.unsplash.com/photo-1608889335941-32ac5f2041b9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="照片圆梦" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex flex-col justify-end p-3">
+                        <div class="bg-blue-500/80 w-10 h-10 rounded-full flex items-center justify-center mb-2 backdrop-blur-sm">
+                            <i class="fas fa-magic text-white text-lg"></i>
+                        </div>
+                        <h3 class="text-white font-bold">照片圆梦</h3>
+                        <p class="text-white text-xs opacity-90">多种艺术风格任你选择</p>
+                    </div>
+                </div>
+            </a>
+            
+            <!-- 圆梦视频 -->
+            <a href="image-to-video.html" class="feature-item bg-white rounded-xl overflow-hidden shadow-md">
+                <div class="relative h-full">
+                    <img src="https://images.unsplash.com/photo-1634987189829-78d3d2f6b649?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="圆梦视频" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex flex-col justify-end p-3">
+                        <div class="bg-purple-500/80 w-10 h-10 rounded-full flex items-center justify-center mb-2 backdrop-blur-sm">
+                            <i class="fas fa-film text-white text-lg"></i>
+                        </div>
+                        <h3 class="text-white font-bold">圆梦视频</h3>
+                        <p class="text-white text-xs opacity-90">让静态图片动起来</p>
+                    </div>
+                </div>
+            </a>
+            
+            <!-- 表情包大师 -->
+            <a href="emoji_master.html" class="feature-item bg-white rounded-xl overflow-hidden shadow-md">
+                <div class="relative h-full">
+                    <img src="https://images.unsplash.com/photo-1507484467459-0c01be16726e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="表情包大师" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex flex-col justify-end p-3">
+                        <div class="bg-yellow-500/80 w-10 h-10 rounded-full flex items-center justify-center mb-2 backdrop-blur-sm">
+                            <i class="far fa-laugh-beam text-white text-lg"></i>
+                        </div>
+                        <h3 class="text-white font-bold">表情包大师</h3>
+                        <p class="text-white text-xs opacity-90">一键制作微信表情</p>
+                    </div>
+                </div>
+            </a>
+            
+            <!-- 梦想商城 -->
+            <a href="shop.html" class="feature-item bg-white rounded-xl overflow-hidden shadow-md">
+                <div class="relative h-full">
+                    <img src="https://images.unsplash.com/photo-1631125915902-d8abe55ac012?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="梦想商城" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex flex-col justify-end p-3">
+                        <div class="bg-red-500/80 w-10 h-10 rounded-full flex items-center justify-center mb-2 backdrop-blur-sm">
+                            <i class="fas fa-gift text-white text-lg"></i>
+                        </div>
+                        <h3 class="text-white font-bold">梦想商城</h3>
+                        <p class="text-white text-xs opacity-90">创意变实物，专属于你</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- 热门推荐 -->
+    <div class="mt-4">
+        <div class="px-4 flex justify-between items-center mb-3">
+            <h2 class="text-lg font-bold text-gray-800">热门推荐</h2>
+            <a href="#" class="text-sm text-blue-500">更多</a>
+        </div>
+        
+        <!-- 照片圆梦区域 -->
+        <div class="mb-6">
+            <div class="px-4 mb-2 flex items-center">
+                <div class="w-1 h-4 bg-blue-500 rounded-full mr-2"></div>
+                <h3 class="text-sm font-medium text-gray-700">照片圆梦</h3>
+            </div>
+            <div class="relative overflow-hidden">
+                <div class="flex overflow-x-auto py-2 px-4 hide-scrollbar" style="white-space: nowrap;">
+                    <!-- 自动滚动的卡片组 (胶片效果) -->
+                    <div class="flex animate-filmstrip">
+                        <!-- 第一组卡片 -->
+                        <div class="flex-shrink-0 w-32 mx-1.5 rounded-lg overflow-hidden shadow-sm">
+                            <img src="https://images.unsplash.com/photo-1695218868733-5a88ac270daa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="吉卜力风格" class="w-full h-32 object-cover">
+                            <div class="p-2 bg-white">
+                                <h4 class="text-xs font-medium text-gray-800 truncate">吉卜力风格</h4>
+                                <p class="text-xs text-gray-500">2.3万人喜欢</p>
+                            </div>
+                        </div>
+                        <div class="flex-shrink-0 w-32 mx-1.5 rounded-lg overflow-hidden shadow-sm">
+                            <img src="https://images.unsplash.com/photo-1682695796954-bad0d0f59ff1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="迪士尼角色" class="w-full h-32 object-cover">
+                            <div class="p-2 bg-white">
+                                <h4 class="text-xs font-medium text-gray-800 truncate">迪士尼角色</h4>
+                                <p class="text-xs text-gray-500">1.8万人喜欢</p>
+                            </div>
+                        </div>
+                        <div class="flex-shrink-0 w-32 mx-1.5 rounded-lg overflow-hidden shadow-sm">
+                            <img src="https://images.unsplash.com/photo-1617503752587-97d2103a96ea?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="水墨画风格" class="w-full h-32 object-cover">
+                            <div class="p-2 bg-white">
+                                <h4 class="text-xs font-medium text-gray-800 truncate">水墨画风格</h4>
+                                <p class="text-xs text-gray-500">1.2万人喜欢</p>
+                            </div>
+                        </div>
+                        <div class="flex-shrink-0 w-32 mx-1.5 rounded-lg overflow-hidden shadow-sm">
+                            <img src="https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="油画风格" class="w-full h-32 object-cover">
+                            <div class="p-2 bg-white">
+                                <h4 class="text-xs font-medium text-gray-800 truncate">油画风格</h4>
+                                <p class="text-xs text-gray-500">0.9万人喜欢</p>
+                            </div>
+                        </div>
+                        <!-- 重复卡片以实现无缝滚动 -->
+                        <div class="flex-shrink-0 w-32 mx-1.5 rounded-lg overflow-hidden shadow-sm">
+                            <img src="https://images.unsplash.com/photo-1695218868733-5a88ac270daa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="吉卜力风格" class="w-full h-32 object-cover">
+                            <div class="p-2 bg-white">
+                                <h4 class="text-xs font-medium text-gray-800 truncate">吉卜力风格</h4>
+                                <p class="text-xs text-gray-500">2.3万人喜欢</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 圆梦视频区域 -->
+        <div class="mb-6">
+            <div class="px-4 mb-2 flex items-center">
+                <div class="w-1 h-4 bg-purple-500 rounded-full mr-2"></div>
+                <h3 class="text-sm font-medium text-gray-700">圆梦视频</h3>
+            </div>
+            <div class="relative overflow-hidden">
+                <div class="flex overflow-x-auto py-2 px-4 hide-scrollbar" style="white-space: nowrap;">
+                    <!-- 自动滚动的卡片组 (胶片效果) -->
+                    <div class="flex animate-filmstrip" style="animation-duration: 35s; animation-direction: reverse;">
+                        <div class="flex-shrink-0 w-32 mx-1.5 rounded-lg overflow-hidden shadow-sm">
+                            <img src="https://images.unsplash.com/photo-1559028012-481c04fa702d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="动态乐高人偶" class="w-full h-32 object-cover">
+                            <div class="p-2 bg-white">
+                                <h4 class="text-xs font-medium text-gray-800 truncate">动态乐高人偶</h4>
+                                <p class="text-xs text-gray-500">1.5万人喜欢</p>
+                            </div>
+                        </div>
+                        <div class="flex-shrink-0 w-32 mx-1.5 rounded-lg overflow-hidden shadow-sm">
+                            <img src="https://images.unsplash.com/photo-1634987189829-78d3d2f6b649?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="动画漫游场景" class="w-full h-32 object-cover">
+                            <div class="p-2 bg-white">
+                                <h4 class="text-xs font-medium text-gray-800 truncate">动画漫游场景</h4>
+                                <p class="text-xs text-gray-500">1.3万人喜欢</p>
+                            </div>
+                        </div>
+                        <div class="flex-shrink-0 w-32 mx-1.5 rounded-lg overflow-hidden shadow-sm">
+                            <img src="https://images.unsplash.com/photo-1608889825103-eb5ed706fc64?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="梦幻动态壁纸" class="w-full h-32 object-cover">
+                            <div class="p-2 bg-white">
+                                <h4 class="text-xs font-medium text-gray-800 truncate">梦幻动态壁纸</h4>
+                                <p class="text-xs text-gray-500">0.9万人喜欢</p>
+                            </div>
+                        </div>
+                        <div class="flex-shrink-0 w-32 mx-1.5 rounded-lg overflow-hidden shadow-sm">
+                            <img src="https://images.unsplash.com/photo-1660479643704-1e586a6dfb0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="动态人像" class="w-full h-32 object-cover">
+                            <div class="p-2 bg-white">
+                                <h4 class="text-xs font-medium text-gray-800 truncate">动态人像</h4>
+                                <p class="text-xs text-gray-500">0.7万人喜欢</p>
+                            </div>
+                        </div>
+                        <!-- 重复卡片以实现无缝滚动 -->
+                        <div class="flex-shrink-0 w-32 mx-1.5 rounded-lg overflow-hidden shadow-sm">
+                            <img src="https://images.unsplash.com/photo-1559028012-481c04fa702d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="动态乐高人偶" class="w-full h-32 object-cover">
+                            <div class="p-2 bg-white">
+                                <h4 class="text-xs font-medium text-gray-800 truncate">动态乐高人偶</h4>
+                                <p class="text-xs text-gray-500">1.5万人喜欢</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 表情包大师区域 -->
+        <div class="mb-6">
+            <div class="px-4 mb-2 flex items-center">
+                <div class="w-1 h-4 bg-yellow-500 rounded-full mr-2"></div>
+                <h3 class="text-sm font-medium text-gray-700">表情包大师</h3>
+            </div>
+            <div class="relative overflow-hidden">
+                <div class="flex overflow-x-auto py-2 px-4 hide-scrollbar" style="white-space: nowrap;">
+                    <!-- 自动滚动的卡片组 (胶片效果) -->
+                    <div class="flex animate-filmstrip" style="animation-duration: 25s;">
+                        <div class="flex-shrink-0 w-32 mx-1.5 rounded-lg overflow-hidden shadow-sm">
+                            <img src="https://images.unsplash.com/photo-1507484467459-0c01be16726e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="人物表情包" class="w-full h-32 object-cover">
+                            <div class="p-2 bg-white">
+                                <h4 class="text-xs font-medium text-gray-800 truncate">人物表情包</h4>
+                                <p class="text-xs text-gray-500">2.1万人喜欢</p>
+                            </div>
+                        </div>
+                        <div class="flex-shrink-0 w-32 mx-1.5 rounded-lg overflow-hidden shadow-sm">
+                            <img src="https://images.unsplash.com/photo-1607990283143-e81e7a2c9349?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="萌宠表情包" class="w-full h-32 object-cover">
+                            <div class="p-2 bg-white">
+                                <h4 class="text-xs font-medium text-gray-800 truncate">萌宠表情包</h4>
+                                <p class="text-xs text-gray-500">1.6万人喜欢</p>
+                            </div>
+                        </div>
+                        <div class="flex-shrink-0 w-32 mx-1.5 rounded-lg overflow-hidden shadow-sm">
+                            <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="动态表情包" class="w-full h-32 object-cover">
+                            <div class="p-2 bg-white">
+                                <h4 class="text-xs font-medium text-gray-800 truncate">动态表情包</h4>
+                                <p class="text-xs text-gray-500">1.4万人喜欢</p>
+                            </div>
+                        </div>
+                        <div class="flex-shrink-0 w-32 mx-1.5 rounded-lg overflow-hidden shadow-sm">
+                            <img src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="个性文字表情" class="w-full h-32 object-cover">
+                            <div class="p-2 bg-white">
+                                <h4 class="text-xs font-medium text-gray-800 truncate">个性文字表情</h4>
+                                <p class="text-xs text-gray-500">0.8万人喜欢</p>
+                            </div>
+                        </div>
+                        <!-- 重复卡片以实现无缝滚动 -->
+                        <div class="flex-shrink-0 w-32 mx-1.5 rounded-lg overflow-hidden shadow-sm">
+                            <img src="https://images.unsplash.com/photo-1507484467459-0c01be16726e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="人物表情包" class="w-full h-32 object-cover">
+                            <div class="p-2 bg-white">
+                                <h4 class="text-xs font-medium text-gray-800 truncate">人物表情包</h4>
+                                <p class="text-xs text-gray-500">2.1万人喜欢</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 梦想商城区域 -->
+        <div class="mb-6">
+            <div class="px-4 mb-2 flex items-center">
+                <div class="w-1 h-4 bg-red-500 rounded-full mr-2"></div>
+                <h3 class="text-sm font-medium text-gray-700">梦想商城</h3>
+            </div>
+            <div class="relative overflow-hidden">
+                <div class="flex overflow-x-auto py-2 px-4 hide-scrollbar" style="white-space: nowrap;">
+                    <!-- 自动滚动的卡片组 (胶片效果) -->
+                    <div class="flex animate-filmstrip" style="animation-duration: 40s; animation-direction: reverse;">
+                        <div class="flex-shrink-0 w-32 mx-1.5 rounded-lg overflow-hidden shadow-sm">
+                            <img src="https://images.unsplash.com/photo-1631125915902-d8abe55ac012?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="3D车载玩偶" class="w-full h-32 object-cover">
+                            <div class="p-2 bg-white">
+                                <h4 class="text-xs font-medium text-gray-800 truncate">3D车载玩偶</h4>
+                                <p class="text-xs text-red-500 font-medium">¥266</p>
+                            </div>
+                        </div>
+                        <div class="flex-shrink-0 w-32 mx-1.5 rounded-lg overflow-hidden shadow-sm">
+                            <img src="https://images.unsplash.com/photo-1602532305019-3dbbd482dae9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="个性钥匙链" class="w-full h-32 object-cover">
+                            <div class="p-2 bg-white">
+                                <h4 class="text-xs font-medium text-gray-800 truncate">个性钥匙链</h4>
+                                <p class="text-xs text-red-500 font-medium">¥39</p>
+                            </div>
+                        </div>
+                        <div class="flex-shrink-0 w-32 mx-1.5 rounded-lg overflow-hidden shadow-sm">
+                            <img src="https://images.unsplash.com/photo-1591197172062-c718f82aba20?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="定制抱枕" class="w-full h-32 object-cover">
+                            <div class="p-2 bg-white">
+                                <h4 class="text-xs font-medium text-gray-800 truncate">定制抱枕</h4>
+                                <p class="text-xs text-red-500 font-medium">¥88</p>
+                            </div>
+                        </div>
+                        <div class="flex-shrink-0 w-32 mx-1.5 rounded-lg overflow-hidden shadow-sm">
+                            <img src="https://images.unsplash.com/photo-1584269600464-37b1b58a9fe7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="毛绒玩偶" class="w-full h-32 object-cover">
+                            <div class="p-2 bg-white">
+                                <h4 class="text-xs font-medium text-gray-800 truncate">毛绒玩偶</h4>
+                                <p class="text-xs text-red-500 font-medium">¥128</p>
+                            </div>
+                        </div>
+                        <!-- 重复卡片以实现无缝滚动 -->
+                        <div class="flex-shrink-0 w-32 mx-1.5 rounded-lg overflow-hidden shadow-sm">
+                            <img src="https://images.unsplash.com/photo-1631125915902-d8abe55ac012?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="3D车载玩偶" class="w-full h-32 object-cover">
+                            <div class="p-2 bg-white">
+                                <h4 class="text-xs font-medium text-gray-800 truncate">3D车载玩偶</h4>
+                                <p class="text-xs text-red-500 font-medium">¥266</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加统一的底部导航栏 - 样式与index.html中完全相同 -->
+    <div id="unifiedBottomNav" class="h-[83px] bg-white border-t border-gray-200 flex justify-around items-center fixed bottom-0 left-0 right-0" style="display: none;">
+        <a href="home.html" class="flex flex-col items-center justify-center w-1/5 text-[#007aff]">
+            <i class="fas fa-home text-2xl mb-1"></i>
+            <span class="text-xs">首页</span>
+        </a>
+        <a href="works.html" class="flex flex-col items-center justify-center w-1/5 text-gray-400">
+            <i class="fas fa-compass text-2xl mb-1"></i>
+            <span class="text-xs">热门</span>
+        </a>
+        <a href="shop.html" class="flex flex-col items-center justify-center w-1/5 text-gray-400">
+            <i class="fas fa-store text-2xl mb-1"></i>
+            <span class="text-xs">商城</span>
+        </a>
+        <a href="me.html" class="flex flex-col items-center justify-center w-1/5 text-gray-400">
+            <i class="fas fa-user text-2xl mb-1"></i>
+            <span class="text-xs">我的</span>
+        </a>
+    </div>
+
+    <script>
+        // 检测是否在iframe中加载
+        document.addEventListener('DOMContentLoaded', function() {
+            const isInIframe = window.self !== window.top;
+            const unifiedBottomNav = document.getElementById('unifiedBottomNav');
+            
+            // 如果不在iframe中，显示统一导航栏
+            if (!isInIframe && unifiedBottomNav) {
+                unifiedBottomNav.style.display = 'flex';
+                
+                // 配置导航点击事件
+                setupNavigation();
+            }
+            
+            // 设置导航栏点击事件处理函数
+            function setupNavigation() {
+                const navLinks = unifiedBottomNav.querySelectorAll('a');
+                
+                navLinks.forEach(link => {
+                    link.addEventListener('click', function(e) {
+                        // 阻止默认行为，手动处理导航
+                        e.preventDefault();
+                        
+                        // 获取目标页面
+                        const href = this.getAttribute('href');
+                        
+                        // 跳转到目标页面
+                        window.location.href = href;
+                    });
+                });
+            }
+        });
+
+        // 轮播图切换效果
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.banner-slide');
+        const dots = document.querySelectorAll('.banner-dot');
+        
+        function showSlide(index) {
+            slides.forEach(slide => slide.classList.remove('active'));
+            dots.forEach(dot => dot.classList.remove('active'));
+            
+            slides[index].classList.add('active');
+            dots[index].classList.add('active');
+            currentSlide = index;
+        }
+        
+        // 点击指示器切换轮播图
+        dots.forEach((dot, index) => {
+            dot.addEventListener('click', () => {
+                showSlide(index);
+            });
+        });
+        
+        // 自动轮播
+        setInterval(() => {
+            let nextSlide = (currentSlide + 1) % slides.length;
+            showSlide(nextSlide);
+        }, 3000);
+    </script>
+</body>
+</html> 

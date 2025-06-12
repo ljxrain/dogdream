@@ -1,0 +1,1 @@
+export { default as component } from "../../../../src/routes/photo-to-image/+page.svelte";

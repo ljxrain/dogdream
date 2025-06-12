@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>作品管理 - AI创意魔方</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #f8f8f8;
+            padding-top: 44px; /* 为状态栏预留空间 */
+            height: calc(100vh - 44px - 83px); /* 减去状态栏和底部导航的高度 */
+            overflow-y: auto;
+        }
+        .works-tab {
+            transition: all 0.2s ease;
+        }
+        .works-tab.active {
+            color: #007aff;
+            border-bottom: 2px solid #007aff;
+        }
+        .work-item {
+            transition: transform 0.2s ease;
+        }
+        .work-item:active {
+            transform: scale(0.98);
+        }
+        .empty-state {
+            min-height: 300px;
+        }
+        .action-button {
+            transition: all 0.2s ease;
+        }
+        .action-button:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+<body class="pb-16">
+    <!-- 页面头部 -->
+    <header class="bg-white px-4 py-3 flex items-center justify-between sticky top-0 z-10 shadow-sm">
+        <h1 class="text-lg font-semibold text-gray-800">我的作品</h1>
+        <div class="flex items-center space-x-3">
+            <button class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100">
+                <i class="fas fa-search text-gray-600"></i>
+            </button>
+            <button class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100">
+                <i class="fas fa-ellipsis-v text-gray-600"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- 作品分类标签页 -->
+    <div class="bg-white flex border-b">
+        <button class="works-tab flex-1 py-3 text-center active">
+            <span class="text-sm font-medium">全部作品</span>
+        </button>
+        <button class="works-tab flex-1 py-3 text-center text-gray-500">
+            <span class="text-sm font-medium">照片生图</span>
+        </button>
+        <button class="works-tab flex-1 py-3 text-center text-gray-500">
+            <span class="text-sm font-medium">圆梦视频</span>
+        </button>
+        <button class="works-tab flex-1 py-3 text-center text-gray-500">
+            <span class="text-sm font-medium">表情包</span>
+        </button>
+    </div>
+
+    <!-- 作品展示区 -->
+    <div class="p-4">
+        <!-- 作品时间线 -->
+        <div class="mb-6">
+            <h2 class="text-sm text-gray-500 mb-3">今天</h2>
+            <div class="grid grid-cols-2 gap-3">
+                <div class="work-item bg-white rounded-xl overflow-hidden shadow-sm">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1696421767766-33d2307d73e0?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="作品1" class="w-full h-40 object-cover">
+                        <div class="absolute top-2 right-2 flex space-x-1">
+                            <span class="bg-blue-500 text-white text-xs px-2 py-0.5 rounded-full">吉卜力风格</span>
+                        </div>
+                    </div>
+                    <div class="p-3">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <h3 class="font-medium text-gray-800 text-sm">夏日记忆</h3>
+                                <p class="text-xs text-gray-500 mt-0.5">12:30</p>
+                            </div>
+                            <button class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100">
+                                <i class="fas fa-ellipsis-h text-gray-500 text-xs"></i>
+                            </button>
+                        </div>
+                        <div class="flex space-x-2 mt-2">
+                            <button class="action-button flex-1 text-xs py-1.5 rounded-full bg-blue-500 text-white">
+                                <i class="fas fa-magic mr-1"></i> 再创作
+                            </button>
+                            <button class="action-button flex-1 text-xs py-1.5 rounded-full bg-white border border-gray-200 text-gray-600">
+                                <i class="fas fa-share-alt mr-1"></i> 分享
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="work-item bg-white rounded-xl overflow-hidden shadow-sm">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1608889476561-6242cfdbf622?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="作品2" class="w-full h-40 object-cover">
+                        <div class="absolute top-2 right-2 flex space-x-1">
+                            <span class="bg-purple-500 text-white text-xs px-2 py-0.5 rounded-full">迪士尼风格</span>
+                        </div>
+                    </div>
+                    <div class="p-3">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <h3 class="font-medium text-gray-800 text-sm">梦幻公主</h3>
+                                <p class="text-xs text-gray-500 mt-0.5">09:45</p>
+                            </div>
+                            <button class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100">
+                                <i class="fas fa-ellipsis-h text-gray-500 text-xs"></i>
+                            </button>
+                        </div>
+                        <div class="flex space-x-2 mt-2">
+                            <button class="action-button flex-1 text-xs py-1.5 rounded-full bg-blue-500 text-white">
+                                <i class="fas fa-magic mr-1"></i> 再创作
+                            </button>
+                            <button class="action-button flex-1 text-xs py-1.5 rounded-full bg-white border border-gray-200 text-gray-600">
+                                <i class="fas fa-share-alt mr-1"></i> 分享
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 昨天的作品 -->
+        <div class="mb-6">
+            <h2 class="text-sm text-gray-500 mb-3">昨天</h2>
+            <div class="grid grid-cols-2 gap-3">
+                <div class="work-item bg-white rounded-xl overflow-hidden shadow-sm">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1560343776-97e7d202ff0e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="作品3" class="w-full h-40 object-cover">
+                        <div class="absolute top-2 right-2 flex space-x-1">
+                            <span class="bg-yellow-500 text-white text-xs px-2 py-0.5 rounded-full">乐高风格</span>
+                        </div>
+                    </div>
+                    <div class="p-3">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <h3 class="font-medium text-gray-800 text-sm">乐高英雄</h3>
+                                <p class="text-xs text-gray-500 mt-0.5">昨天 18:12</p>
+                            </div>
+                            <button class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100">
+                                <i class="fas fa-ellipsis-h text-gray-500 text-xs"></i>
+                            </button>
+                        </div>
+                        <div class="flex space-x-2 mt-2">
+                            <button class="action-button flex-1 text-xs py-1.5 rounded-full bg-blue-500 text-white">
+                                <i class="fas fa-magic mr-1"></i> 再创作
+                            </button>
+                            <button class="action-button flex-1 text-xs py-1.5 rounded-full bg-white border border-gray-200 text-gray-600">
+                                <i class="fas fa-share-alt mr-1"></i> 分享
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="work-item bg-white rounded-xl overflow-hidden shadow-sm">
+                    <div class="relative">
+                        <video class="w-full h-40 object-cover" poster="https://images.unsplash.com/photo-1608889335941-32ac5f2041b9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80">
+                            <source src="#" type="video/mp4">
+                        </video>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="w-12 h-12 rounded-full bg-black/30 flex items-center justify-center backdrop-blur-sm">
+                                <i class="fas fa-play text-white"></i>
+                            </div>
+                        </div>
+                        <div class="absolute top-2 right-2 flex space-x-1">
+                            <span class="bg-green-500 text-white text-xs px-2 py-0.5 rounded-full">动态视频</span>
+                        </div>
+                    </div>
+                    <div class="p-3">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <h3 class="font-medium text-gray-800 text-sm">森林精灵</h3>
+                                <p class="text-xs text-gray-500 mt-0.5">昨天 15:23</p>
+                            </div>
+                            <button class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100">
+                                <i class="fas fa-ellipsis-h text-gray-500 text-xs"></i>
+                            </button>
+                        </div>
+                        <div class="flex space-x-2 mt-2">
+                            <button class="action-button flex-1 text-xs py-1.5 rounded-full bg-blue-500 text-white">
+                                <i class="fas fa-magic mr-1"></i> 再创作
+                            </button>
+                            <button class="action-button flex-1 text-xs py-1.5 rounded-full bg-white border border-gray-200 text-gray-600">
+                                <i class="fas fa-share-alt mr-1"></i> 分享
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 更早的作品 -->
+        <div>
+            <h2 class="text-sm text-gray-500 mb-3">更早</h2>
+            <div class="grid grid-cols-2 gap-3">
+                <div class="work-item bg-white rounded-xl overflow-hidden shadow-sm">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1617503752587-97d2103a96ea?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="作品5" class="w-full h-40 object-cover">
+                        <div class="absolute top-2 right-2 flex space-x-1">
+                            <span class="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">水墨画</span>
+                        </div>
+                    </div>
+                    <div class="p-3">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <h3 class="font-medium text-gray-800 text-sm">东方意境</h3>
+                                <p class="text-xs text-gray-500 mt-0.5">10-13</p>
+                            </div>
+                            <button class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100">
+                                <i class="fas fa-ellipsis-h text-gray-500 text-xs"></i>
+                            </button>
+                        </div>
+                        <div class="flex space-x-2 mt-2">
+                            <button class="action-button flex-1 text-xs py-1.5 rounded-full bg-blue-500 text-white">
+                                <i class="fas fa-magic mr-1"></i> 再创作
+                            </button>
+                            <button class="action-button flex-1 text-xs py-1.5 rounded-full bg-white border border-gray-200 text-gray-600">
+                                <i class="fas fa-share-alt mr-1"></i> 分享
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 表情包作品 -->
+                <div class="work-item bg-white rounded-xl overflow-hidden shadow-sm">
+                    <div class="relative bg-gray-100" style="height: 10rem;">
+                        <div class="grid grid-cols-3 gap-1 p-2 h-full">
+                            <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="表情1" class="w-full h-full object-cover rounded-md">
+                            <img src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="表情2" class="w-full h-full object-cover rounded-md">
+                            <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="表情3" class="w-full h-full object-cover rounded-md">
+                            <img src="https://images.unsplash.com/photo-1607990283143-e81e7a2c9349?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="表情4" class="w-full h-full object-cover rounded-md">
+                            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="表情5" class="w-full h-full object-cover rounded-md">
+                            <div class="w-full h-full bg-gray-200 rounded-md flex items-center justify-center">
+                                <span class="text-gray-500 text-xs">+3</span>
+                            </div>
+                        </div>
+                        <div class="absolute top-2 right-2 flex space-x-1">
+                            <span class="bg-orange-500 text-white text-xs px-2 py-0.5 rounded-full">表情包</span>
+                        </div>
+                    </div>
+                    <div class="p-3">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <h3 class="font-medium text-gray-800 text-sm">我的表情集</h3>
+                                <p class="text-xs text-gray-500 mt-0.5">10-10</p>
+                            </div>
+                            <button class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100">
+                                <i class="fas fa-ellipsis-h text-gray-500 text-xs"></i>
+                            </button>
+                        </div>
+                        <div class="flex space-x-2 mt-2">
+                            <button class="action-button flex-1 text-xs py-1.5 rounded-full bg-blue-500 text-white">
+                                <i class="fas fa-magic mr-1"></i> 编辑
+                            </button>
+                            <button class="action-button flex-1 text-xs py-1.5 rounded-full bg-white border border-gray-200 text-gray-600">
+                                <i class="fas fa-share-alt mr-1"></i> 分享
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 作品操作菜单 (默认隐藏) -->
+        <div class="fixed inset-0 bg-black/50 z-50 hidden">
+            <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-xl">
+                <div class="p-4 border-b">
+                    <div class="flex justify-between items-center">
+                        <h3 class="font-semibold text-gray-800">操作选项</h3>
+                        <button class="w-8 h-8 flex items-center justify-center">
+                            <i class="fas fa-times text-gray-500"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="p-2">
+                    <button class="w-full flex items-center py-3 px-4 hover:bg-gray-50 rounded-lg">
+                        <i class="fas fa-edit text-blue-500 w-6"></i>
+                        <span class="ml-3 text-gray-800">重命名</span>
+                    </button>
+                    <button class="w-full flex items-center py-3 px-4 hover:bg-gray-50 rounded-lg">
+                        <i class="fas fa-download text-green-500 w-6"></i>
+                        <span class="ml-3 text-gray-800">下载</span>
+                    </button>
+                    <button class="w-full flex items-center py-3 px-4 hover:bg-gray-50 rounded-lg">
+                        <i class="fas fa-share-alt text-purple-500 w-6"></i>
+                        <span class="ml-3 text-gray-800">分享</span>
+                    </button>
+                    <button class="w-full flex items-center py-3 px-4 hover:bg-gray-50 rounded-lg">
+                        <i class="fas fa-gift text-amber-500 w-6"></i>
+                        <span class="ml-3 text-gray-800">制作周边</span>
+                    </button>
+                    <button class="w-full flex items-center py-3 px-4 hover:bg-gray-50 rounded-lg">
+                        <i class="fas fa-trash text-red-500 w-6"></i>
+                        <span class="ml-3 text-gray-800">删除</span>
+                    </button>
+                </div>
+                <div class="p-4">
+                    <button class="w-full py-3 bg-gray-100 text-gray-800 rounded-xl font-medium">
+                        取消
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加统一的底部导航栏 - 样式与index.html中完全相同 -->
+    <div id="unifiedBottomNav" class="h-[83px] bg-white border-t border-gray-200 flex justify-around items-center fixed bottom-0 left-0 right-0" style="display: none;">
+        <a href="home.html" class="flex flex-col items-center justify-center w-1/5 text-gray-400">
+            <i class="fas fa-home text-2xl mb-1"></i>
+            <span class="text-xs">首页</span>
+        </a>
+        <a href="works.html" class="flex flex-col items-center justify-center w-1/5 text-[#007aff]">
+            <i class="fas fa-compass text-2xl mb-1"></i>
+            <span class="text-xs">热门</span>
+        </a>
+        <a href="shop.html" class="flex flex-col items-center justify-center w-1/5 text-gray-400">
+            <i class="fas fa-store text-2xl mb-1"></i>
+            <span class="text-xs">商城</span>
+        </a>
+        <a href="me.html" class="flex flex-col items-center justify-center w-1/5 text-gray-400">
+            <i class="fas fa-user text-2xl mb-1"></i>
+            <span class="text-xs">我的</span>
+        </a>
+    </div>
+
+    <script>
+        // 检测是否在iframe中加载
+        document.addEventListener('DOMContentLoaded', function() {
+            const isInIframe = window.self !== window.top;
+            const unifiedBottomNav = document.getElementById('unifiedBottomNav');
+            
+            // 如果不在iframe中，显示统一导航栏
+            if (!isInIframe && unifiedBottomNav) {
+                unifiedBottomNav.style.display = 'flex';
+                
+                // 配置导航点击事件
+                setupNavigation();
+            }
+            
+            // 设置导航栏点击事件处理函数
+            function setupNavigation() {
+                const navLinks = unifiedBottomNav.querySelectorAll('a');
+                
+                navLinks.forEach(link => {
+                    link.addEventListener('click', function(e) {
+                        // 阻止默认行为，手动处理导航
+                        e.preventDefault();
+                        
+                        // 获取目标页面
+                        const href = this.getAttribute('href');
+                        
+                        // 跳转到目标页面
+                        window.location.href = href;
+                    });
+                });
+            }
+        });
+
+        // 标签页切换效果
+        const worksTabs = document.querySelectorAll('.works-tab');
+        worksTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                worksTabs.forEach(t => {
+                    t.classList.remove('active');
+                    t.classList.add('text-gray-500');
+                });
+                tab.classList.add('active');
+                tab.classList.remove('text-gray-500');
+            });
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,171 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String     @id @default(cuid())
+  email     String     @unique
+  name      String?
+  password  String
+  phone     String?
+  address   String?
+  city      String?
+  province  String?
+  avatarUrl String?
+  role      String     @default("USER")
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  creations Creation[]
+  likes     Like[]
+  orders    Order[]
+  shares    Share[]
+
+  @@map("users")
+}
+
+model Creation {
+  id             String   @id @default(cuid())
+  title          String?
+  description    String?
+  sourceImageUrl String
+  resultImageUrl String
+  style          String
+  quality        String
+  fastMode       Boolean  @default(false)
+  status         String   @default("PROCESSING")
+  processingTime Int?
+  isPublic       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  userId         String
+  user           User     @relation(fields: [userId], references: [id])
+  likes          Like[]
+  orders         Order[]
+  shares         Share[]
+
+  @@map("creations")
+}
+
+model Like {
+  id         String   @id @default(cuid())
+  createdAt  DateTime @default(now())
+  userId     String
+  creationId String
+  creation   Creation @relation(fields: [creationId], references: [id])
+  user       User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, creationId])
+  @@map("likes")
+}
+
+model Share {
+  id         String   @id @default(cuid())
+  platform   String
+  createdAt  DateTime @default(now())
+  userId     String
+  creationId String
+  creation   Creation @relation(fields: [creationId], references: [id])
+  user       User     @relation(fields: [userId], references: [id])
+
+  @@map("shares")
+}
+
+model Product {
+  id          String      @id @default(cuid())
+  name        String
+  description String?
+  category    String
+  basePrice   Float
+  imageUrl    String?
+  isActive    Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  orderItems  OrderItem[]
+
+  @@map("products")
+}
+
+model Order {
+  id               String      @id @default(cuid())
+  orderNumber      String      @unique
+  status           String      @default("PENDING")
+  totalAmount      Float
+  shippingFee      Float       @default(0)
+  recipientName    String
+  recipientPhone   String
+  shippingAddress  String
+  shippingCity     String
+  shippingProvince String
+  zipCode          String?
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+  paidAt           DateTime?
+  shippedAt        DateTime?
+  deliveredAt      DateTime?
+  userId           String
+  creationId       String?
+  logistics        Logistics[]
+  orderItems       OrderItem[]
+  creation         Creation?   @relation(fields: [creationId], references: [id])
+  user             User        @relation(fields: [userId], references: [id])
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  quantity  Int
+  unitPrice Float
+  orderId   String
+  productId String
+  order     Order   @relation(fields: [orderId], references: [id])
+  product   Product @relation(fields: [productId], references: [id])
+
+  @@map("order_items")
+}
+
+model Logistics {
+  id             String   @id @default(cuid())
+  trackingNumber String?
+  carrier        String?
+  status         String
+  location       String?
+  description    String?
+  createdAt      DateTime @default(now())
+  orderId        String
+  order          Order    @relation(fields: [orderId], references: [id])
+
+  @@map("logistics")
+}
+
+model Statistics {
+  id        String   @id @default(cuid())
+  type      String
+  key       String
+  value     String
+  date      DateTime
+  createdAt DateTime @default(now())
+
+  @@unique([type, key, date])
+  @@map("statistics")
+}
+
+model RegionStats {
+  id           String   @id @default(cuid())
+  province     String
+  city         String
+  orderCount   Int      @default(0)
+  userCount    Int      @default(0)
+  totalRevenue Float    @default(0)
+  month        String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([province, city, month])
+  @@map("region_stats")
+}

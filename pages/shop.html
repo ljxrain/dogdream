@@ -1,0 +1,1386 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>梦想商城 · 造梦家</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        body {
+            background-color: transparent;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+        }
+        /* 用于独立预览时 */
+        .preview-container {
+            background-color: #e5e7eb;
+            display: none; /* 默认隐藏，仅在独立页面时显示 */
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        /* 热门商品滚动动画 */
+        @keyframes productScroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        /* 暂停动画当用户hover时 */
+        .animate-scroll:hover {
+            animation-play-state: paused;
+        }
+        /* 产品分类按钮交互样式 */
+        .category-btn {
+            transition: all 0.3s ease;
+        }
+        .category-btn:hover {
+            transform: translateY(-2px);
+        }
+        .category-btn.active {
+            box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2);
+        }
+        /* 产品分类导航指示器 */
+        .category-indicator {
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            height: 2px;
+            background-color: #4f46e5;
+            transition: all 0.3s ease-out;
+        }
+    </style>
+</head>
+<body class="no-scrollbar">
+    <!-- 预览容器，仅在独立页面时显示 -->
+    <div class="preview-container">
+        <!-- iPhone 模拟器框架 -->
+        <div class="mx-auto my-6 w-[393px] h-[852px] rounded-[40px] bg-white shadow-2xl overflow-hidden relative">
+            <!-- 内容将被JavaScript复制到这里 -->
+        </div>
+    </div>
+
+    <!-- iPhone 内容区域 - 在iframe中直接显示这部分 -->
+    <div class="w-full h-full bg-white overflow-hidden relative">
+        
+        <!-- iOS 状态栏 -->
+        <div class="pt-3 px-4 flex justify-between items-center h-10 bg-white">
+            <span class="text-xs font-semibold text-gray-700">9:41</span>
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-signal text-xs text-gray-700"></i>
+                <i class="fas fa-wifi text-xs text-gray-700"></i>
+                <i class="fas fa-battery-three-quarters text-xs text-gray-700"></i>
+            </div>
+        </div>
+        
+        <!-- 页面标题 -->
+        <header class="px-4 py-3 bg-white border-b">
+            <div class="flex items-center">
+                <a href="home.html" class="mr-2">
+                    <i class="fas fa-chevron-left text-gray-600"></i>
+                </a>
+                <div>
+                    <h1 class="text-lg font-bold text-gray-800">梦想商城</h1>
+                    <p class="text-xs text-gray-500">把灵感一键变成现实周边</p>
+                </div>
+            </div>
+        </header>
+        
+        <!-- 主体滚动区域 -->
+        <main class="h-[660px] overflow-y-auto px-4 py-3 bg-gray-50 space-y-6">
+            <!-- Step 1: 选择图片 -->
+            <div class="space-y-3">
+                <h2 class="text-sm font-semibold text-gray-700 flex items-center">
+                    <span class="flex items-center justify-center w-5 h-5 bg-indigo-600 text-white rounded-full text-xs mr-2">1</span>
+                    选择图片
+                </h2>
+                <div class="block w-full border-2 border-dashed border-gray-300 rounded-lg overflow-hidden">
+                    <!-- 选择区域 -->
+                    <div id="photoSelectArea" class="flex flex-col items-center justify-center h-36 bg-white">
+                        <i class="fas fa-image text-3xl text-gray-400 mb-2"></i>
+                        <p class="text-gray-500 text-sm mb-3">请选择图片</p>
+                        <div class="flex space-x-3">
+                            <button id="takePhotoBtn" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-xs flex items-center">
+                                <i class="fas fa-camera mr-1"></i> 拍照
+                            </button>
+                            <label for="photoUpload" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg text-xs flex items-center cursor-pointer">
+                                <i class="fas fa-folder-open mr-1"></i> 相册
+                                <input type="file" accept="image/*;capture=camera" class="hidden" id="photoUpload">
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- 预览区域 -->
+                    <div id="photoPreviewArea" class="hidden">
+                        <div class="relative w-full h-36">
+                            <img id="selectedImage" class="w-full h-full object-contain" alt="已选择的照片">
+                            <button id="changePhotoBtn" class="absolute bottom-2 right-2 bg-black/50 text-white rounded-full w-8 h-8 flex items-center justify-center">
+                                <i class="fas fa-camera"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Step 2: 选择产品 -->
+            <div class="space-y-3">
+                <h2 class="text-sm font-semibold text-gray-700 flex items-center">
+                    <span class="flex items-center justify-center w-5 h-5 bg-indigo-600 text-white rounded-full text-xs mr-2">2</span>
+                    选择产品
+                </h2>
+                
+                <!-- 产品分类导航 -->
+                <div class="relative flex overflow-x-auto no-scrollbar mb-1 pb-2">
+                    <button class="category-btn active flex-shrink-0 px-3 py-1.5 bg-indigo-600 text-white rounded-full text-xs mr-2" data-category="all">全部商品</button>
+                    <button class="category-btn flex-shrink-0 px-3 py-1.5 bg-gray-100 text-gray-600 rounded-full text-xs mr-2" data-category="clothing">服饰穿戴</button>
+                    <button class="category-btn flex-shrink-0 px-3 py-1.5 bg-gray-100 text-gray-600 rounded-full text-xs mr-2" data-category="home">家居生活</button>
+                    <button class="category-btn flex-shrink-0 px-3 py-1.5 bg-gray-100 text-gray-600 rounded-full text-xs mr-2" data-category="accessory">个人配饰</button>
+                    <button class="category-btn flex-shrink-0 px-3 py-1.5 bg-gray-100 text-gray-600 rounded-full text-xs mr-2" data-category="stationery">办公文具</button>
+                    <div class="category-indicator"></div>
+                </div>
+                
+                <!-- 分类标题 -->
+                <div class="flex items-center mb-3">
+                    <h3 id="categoryTitle" class="text-sm font-medium text-gray-800">全部商品</h3>
+                    <span class="ml-2 px-1.5 py-0.5 text-[10px] bg-indigo-100 text-indigo-600 rounded-full" id="productCount">16</span>
+                    <div class="ml-auto">
+                        <button class="w-6 h-6 flex items-center justify-center rounded-full text-gray-500 mr-1">
+                            <i class="fas fa-th-large text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 产品网格 -->
+                <div id="productGrid" class="grid grid-cols-2 gap-3 mb-4">
+                    <!-- 产品卡片 - 10种POD产品 -->
+                    <div class="product-card bg-white rounded-lg overflow-hidden shadow-md border border-gray-100 cursor-pointer transform transition-transform hover:scale-[1.02] hover:shadow-lg" data-name="定制T恤" data-price="49" data-desc="采用优质纯棉面料，舒适透气，专属个性定制图案，夏季穿着清爽舒适。" data-quality="A级面料|环保印染|耐洗不掉色" data-category="clothing">
+                        <div class="relative">
+                            <div class="h-28 overflow-hidden bg-gradient-to-br from-indigo-50 to-gray-50">
+                                <img src="https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?q=80&w=250" alt="定制T恤" class="w-full h-full object-cover hover:opacity-90 transition-opacity">
+                            </div>
+                            <span class="absolute top-2 right-2 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">HOT</span>
+                        </div>
+                        <div class="p-2.5">
+                            <h3 class="text-xs font-medium text-gray-800 line-clamp-1">定制T恤</h3>
+                            <div class="flex justify-between items-center mt-1.5">
+                                <span class="text-red-600 text-xs font-bold">¥49.00</span>
+                                <div class="flex items-center text-[10px] text-amber-500">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star-half-alt"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="product-card bg-white rounded-lg overflow-hidden shadow-md border border-gray-100 cursor-pointer transform transition-transform hover:scale-[1.02] hover:shadow-lg" data-name="手机壳" data-price="29" data-desc="适用多种型号，3D立体打印，防摔防刮，完美贴合手机，保护手机的同时彰显个性。" data-quality="抗UV材质|防摔设计|静电防尘" data-category="accessory">
+                        <div class="relative">
+                            <div class="h-28 overflow-hidden bg-gradient-to-br from-indigo-50 to-gray-50">
+                                <img src="https://images.unsplash.com/photo-1606220588913-b3aacb4d2f46?q=80&w=250" alt="手机壳" class="w-full h-full object-cover hover:opacity-90 transition-opacity">
+                            </div>
+                            <span class="absolute top-2 right-2 bg-green-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">NEW</span>
+                        </div>
+                        <div class="p-2.5">
+                            <h3 class="text-xs font-medium text-gray-800 line-clamp-1">个性手机壳</h3>
+                            <div class="flex justify-between items-center mt-1.5">
+                                <span class="text-red-600 text-xs font-bold">¥29.00</span>
+                                <div class="flex items-center text-[10px] text-amber-500">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="far fa-star"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="product-card bg-white rounded-lg overflow-hidden shadow-md border border-gray-100 cursor-pointer transform transition-transform hover:scale-[1.02] hover:shadow-lg" data-name="保温杯" data-price="59" data-desc="304不锈钢内胆，双层真空保温，可保温保冷12小时以上，个性图案永久不褪色。" data-quality="食品级不锈钢|12小时保温|防滑底座" data-category="home">
+                        <div class="relative">
+                            <div class="h-28 overflow-hidden bg-gradient-to-br from-indigo-50 to-gray-50">
+                                <img src="https://images.unsplash.com/photo-1578447355583-6c0a69392e84?q=80&w=250" alt="保温杯" class="w-full h-full object-cover hover:opacity-90 transition-opacity">
+                            </div>
+                        </div>
+                        <div class="p-2.5">
+                            <h3 class="text-xs font-medium text-gray-800 line-clamp-1">保温杯定制</h3>
+                            <div class="flex justify-between items-center mt-1.5">
+                                <span class="text-red-600 text-xs font-bold">¥59.00</span>
+                                <div class="flex items-center text-[10px] text-amber-500">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="product-card bg-white rounded-lg overflow-hidden shadow-md border border-gray-100 cursor-pointer transform transition-transform hover:scale-[1.02] hover:shadow-lg" data-name="3D手办" data-price="198" data-desc="采用高精度3D打印技术，细节丰富，造型生动，UV固化树脂材质，耐用且抗老化。" data-quality="高精3D打印|手工精细抛光|聚氨酯漆面" data-category="home">
+                        <div class="relative">
+                            <div class="h-28 overflow-hidden bg-gradient-to-br from-indigo-50 to-gray-50">
+                                <img src="https://images.unsplash.com/photo-1555448248-2571daf6344b?q=80&w=250" alt="3D手办" class="w-full h-full object-cover hover:opacity-90 transition-opacity">
+                            </div>
+                            <span class="absolute top-2 right-2 bg-purple-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">限量</span>
+                        </div>
+                        <div class="p-2.5">
+                            <h3 class="text-xs font-medium text-gray-800 line-clamp-1">3D手办/车载摆件</h3>
+                            <div class="flex justify-between items-center mt-1.5">
+                                <span class="text-red-600 text-xs font-bold">¥198.00</span>
+                                <div class="flex items-center text-[10px] text-amber-500">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star-half-alt"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="product-card bg-white rounded-lg overflow-hidden shadow-md border border-gray-100 cursor-pointer transform transition-transform hover:scale-[1.02] hover:shadow-lg" data-name="抱枕" data-price="39" data-desc="柔软舒适的高密度面料，内含环保PP棉填充，图案色彩饱满，不褪色，不起球。" data-quality="柔软亲肤|不褪色|高弹回弹" data-category="home">
+                        <div class="relative">
+                            <div class="h-28 overflow-hidden bg-gradient-to-br from-indigo-50 to-gray-50">
+                                <img src="https://images.unsplash.com/photo-1567016520496-0cb4edbb4f15?q=80&w=250" alt="抱枕" class="w-full h-full object-cover hover:opacity-90 transition-opacity">
+                            </div>
+                            <span class="absolute top-2 right-2 bg-orange-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">特惠</span>
+                        </div>
+                        <div class="p-2.5">
+                            <h3 class="text-xs font-medium text-gray-800 line-clamp-1">定制抱枕</h3>
+                            <div class="flex justify-between items-center mt-1.5">
+                                <span class="text-red-600 text-xs font-bold">¥39.00</span>
+                                <div class="flex items-center text-[10px] text-amber-500">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="far fa-star"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="product-card bg-white rounded-lg overflow-hidden shadow-md border border-gray-100 cursor-pointer transform transition-transform hover:scale-[1.02] hover:shadow-lg" data-name="照片书" data-price="99" data-desc="157g铜版纸印刷，精美硬壳封面，精装烫金工艺，每一页都留下专属回忆。" data-quality="进口铜版纸|超清印刷|UV覆膜" data-category="stationery">
+                        <div class="relative">
+                            <div class="h-28 overflow-hidden bg-gradient-to-br from-indigo-50 to-gray-50">
+                                <img src="https://images.unsplash.com/photo-1531346878377-a5be20888e57?q=80&w=250" alt="照片书" class="w-full h-full object-cover hover:opacity-90 transition-opacity">
+                            </div>
+                        </div>
+                        <div class="p-2.5">
+                            <h3 class="text-xs font-medium text-gray-800 line-clamp-1">照片书/相册</h3>
+                            <div class="flex justify-between items-center mt-1.5">
+                                <span class="text-red-600 text-xs font-bold">¥99.00</span>
+                                <div class="flex items-center text-[10px] text-amber-500">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="product-card bg-white rounded-lg overflow-hidden shadow-md border border-gray-100 cursor-pointer transform transition-transform hover:scale-[1.02] hover:shadow-lg" data-name="钥匙链" data-price="15" data-desc="采用优质金属材质，激光雕刻，图案精美细腻，不易磨损，适合随身携带。" data-quality="航空铝材质|激光雕刻|防刮耐磨" data-category="accessory">
+                        <div class="relative">
+                            <div class="h-28 overflow-hidden bg-gradient-to-br from-indigo-50 to-gray-50">
+                                <img src="https://images.unsplash.com/photo-1581420515590-cee76de451b5?q=80&w=250" alt="钥匙链" class="w-full h-full object-cover hover:opacity-90 transition-opacity">
+                            </div>
+                        </div>
+                        <div class="p-2.5">
+                            <h3 class="text-xs font-medium text-gray-800 line-clamp-1">金属钥匙链</h3>
+                            <div class="flex justify-between items-center mt-1.5">
+                                <span class="text-red-600 text-xs font-bold">¥15.00</span>
+                                <div class="flex items-center text-[10px] text-amber-500">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star-half-alt"></i>
+                                    <i class="far fa-star"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="product-card bg-white rounded-lg overflow-hidden shadow-md border border-gray-100 cursor-pointer transform transition-transform hover:scale-[1.02] hover:shadow-lg" data-name="公仔抱枕" data-price="88" data-desc="手感柔软的毛绒面料，立体造型设计，手工缝制细节，填充饱满有弹性。" data-quality="优质毛绒面料|饱满PP棉|立体缝合" data-category="home">
+                        <div class="relative">
+                            <div class="h-28 overflow-hidden bg-gradient-to-br from-indigo-50 to-gray-50">
+                                <img src="https://images.unsplash.com/photo-1559715541-5daf8a0296e0?q=80&w=250" alt="公仔抱枕" class="w-full h-full object-cover hover:opacity-90 transition-opacity">
+                            </div>
+                        </div>
+                        <div class="p-2.5">
+                            <h3 class="text-xs font-medium text-gray-800 line-clamp-1">公仔抱枕</h3>
+                            <div class="flex justify-between items-center mt-1.5">
+                                <span class="text-red-600 text-xs font-bold">¥88.00</span>
+                                <div class="flex items-center text-[10px] text-amber-500">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star-half-alt"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="product-card bg-white rounded-lg overflow-hidden shadow-md border border-gray-100 cursor-pointer transform transition-transform hover:scale-[1.02] hover:shadow-lg" data-name="创意贴纸" data-price="9" data-desc="防水耐晒材质，可水洗不掉色，适用于各种平面贴附，随心装饰生活。" data-quality="PVC防水|耐晒耐磨|可反复粘贴" data-category="stationery">
+                        <div class="relative">
+                            <div class="h-28 overflow-hidden bg-gradient-to-br from-indigo-50 to-gray-50">
+                                <img src="https://images.unsplash.com/photo-1572375992501-4b0892d50c69?q=80&w=250" alt="创意贴纸" class="w-full h-full object-cover hover:opacity-90 transition-opacity">
+                            </div>
+                            <span class="absolute top-2 right-2 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">爆款</span>
+                        </div>
+                        <div class="p-2.5">
+                            <h3 class="text-xs font-medium text-gray-800 line-clamp-1">创意贴纸套装</h3>
+                            <div class="flex justify-between items-center mt-1.5">
+                                <span class="text-red-600 text-xs font-bold">¥9.00</span>
+                                <div class="flex items-center text-[10px] text-amber-500">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="far fa-star"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="product-card bg-white rounded-lg overflow-hidden shadow-md border border-gray-100 cursor-pointer transform transition-transform hover:scale-[1.02] hover:shadow-lg" data-name="刻字吊坠" data-price="129" data-desc="925银材质，表面可刻字定制，精细打磨抛光，附赠精美礼盒包装。" data-quality="925纯银|精致刻字|礼盒包装" data-category="accessory">
+                        <div class="relative">
+                            <div class="h-28 overflow-hidden bg-gradient-to-br from-indigo-50 to-gray-50">
+                                <img src="https://images.unsplash.com/photo-1588444837495-c6cfeb53f32d?q=80&w=250" alt="刻字吊坠" class="w-full h-full object-cover hover:opacity-90 transition-opacity">
+                            </div>
+                        </div>
+                        <div class="p-2.5">
+                            <h3 class="text-xs font-medium text-gray-800 line-clamp-1">刻字吊坠</h3>
+                            <div class="flex justify-between items-center mt-1.5">
+                                <span class="text-red-600 text-xs font-bold">¥129.00</span>
+                                <div class="flex items-center text-[10px] text-amber-500">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star-half-alt"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 新增产品：帽衫 -->
+                    <div class="product-card bg-white rounded-lg overflow-hidden shadow-md border border-gray-100 cursor-pointer transform transition-transform hover:scale-[1.02] hover:shadow-lg" data-name="连帽卫衣" data-price="129" data-desc="保暖舒适的加绒帽衫，宽松版型，个性图案定制，适合日常休闲和运动穿着。" data-quality="优质加绒|抗皱耐用|版型宽松" data-category="clothing">
+                        <div class="relative">
+                            <div class="h-28 overflow-hidden bg-gradient-to-br from-indigo-50 to-gray-50">
+                                <img src="https://images.unsplash.com/photo-1572495641004-28421ae29abb?q=80&w=250" alt="连帽卫衣" class="w-full h-full object-cover hover:opacity-90 transition-opacity">
+                            </div>
+                            <span class="absolute top-2 right-2 bg-green-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">NEW</span>
+                        </div>
+                        <div class="p-2.5">
+                            <h3 class="text-xs font-medium text-gray-800 line-clamp-1">连帽卫衣</h3>
+                            <div class="flex justify-between items-center mt-1.5">
+                                <span class="text-red-600 text-xs font-bold">¥129.00</span>
+                                <div class="flex items-center text-[10px] text-amber-500">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 新增产品：围巾 -->
+                    <div class="product-card bg-white rounded-lg overflow-hidden shadow-md border border-gray-100 cursor-pointer transform transition-transform hover:scale-[1.02] hover:shadow-lg" data-name="定制围巾" data-price="69" data-desc="100%纯羊毛材质，柔软亲肤，个性图案定制，防风保暖，四季百搭。" data-quality="纯羊毛|防风保暖|不掉色" data-category="clothing">
+                        <div class="relative">
+                            <div class="h-28 overflow-hidden bg-gradient-to-br from-indigo-50 to-gray-50">
+                                <img src="https://images.unsplash.com/photo-1520903920243-00d872a2d1c9?q=80&w=250" alt="定制围巾" class="w-full h-full object-cover hover:opacity-90 transition-opacity">
+                            </div>
+                        </div>
+                        <div class="p-2.5">
+                            <h3 class="text-xs font-medium text-gray-800 line-clamp-1">定制围巾</h3>
+                            <div class="flex justify-between items-center mt-1.5">
+                                <span class="text-red-600 text-xs font-bold">¥69.00</span>
+                                <div class="flex items-center text-[10px] text-amber-500">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="far fa-star"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 新增产品：笔记本 -->
+                    <div class="product-card bg-white rounded-lg overflow-hidden shadow-md border border-gray-100 cursor-pointer transform transition-transform hover:scale-[1.02] hover:shadow-lg" data-name="定制笔记本" data-price="45" data-desc="环保纸质，个性封面定制，内页设计多样可选，精美装订，记录生活灵感。" data-quality="环保纸张|精美装订|多样内页" data-category="stationery">
+                        <div class="relative">
+                            <div class="h-28 overflow-hidden bg-gradient-to-br from-indigo-50 to-gray-50">
+                                <img src="https://images.unsplash.com/photo-1531346878377-a5be20888e57?q=80&w=250" alt="定制笔记本" class="w-full h-full object-cover hover:opacity-90 transition-opacity">
+                            </div>
+                            <span class="absolute top-2 right-2 bg-orange-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">特惠</span>
+                        </div>
+                        <div class="p-2.5">
+                            <h3 class="text-xs font-medium text-gray-800 line-clamp-1">定制笔记本</h3>
+                            <div class="flex justify-between items-center mt-1.5">
+                                <span class="text-red-600 text-xs font-bold">¥45.00</span>
+                                <div class="flex items-center text-[10px] text-amber-500">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="far fa-star"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 新增产品：棒球帽 -->
+                    <div class="product-card bg-white rounded-lg overflow-hidden shadow-md border border-gray-100 cursor-pointer transform transition-transform hover:scale-[1.02] hover:shadow-lg" data-name="个性棒球帽" data-price="59" data-desc="高质量棉质面料，3D刺绣定制，大小可调节，四季百搭，防晒遮阳。" data-quality="优质棉质|3D刺绣|可调节" data-category="clothing">
+                        <div class="relative">
+                            <div class="h-28 overflow-hidden bg-gradient-to-br from-indigo-50 to-gray-50">
+                                <img src="https://images.unsplash.com/photo-1521369909029-2afed882baee?q=80&w=250" alt="个性棒球帽" class="w-full h-full object-cover hover:opacity-90 transition-opacity">
+                            </div>
+                        </div>
+                        <div class="p-2.5">
+                            <h3 class="text-xs font-medium text-gray-800 line-clamp-1">个性棒球帽</h3>
+                            <div class="flex justify-between items-center mt-1.5">
+                                <span class="text-red-600 text-xs font-bold">¥59.00</span>
+                                <div class="flex items-center text-[10px] text-amber-500">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star-half-alt"></i>
+                                    <i class="far fa-star"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 新增产品：相框 -->
+                    <div class="product-card bg-white rounded-lg overflow-hidden shadow-md border border-gray-100 cursor-pointer transform transition-transform hover:scale-[1.02] hover:shadow-lg" data-name="定制相框" data-price="79" data-desc="高品质木质相框，边框可定制个性图案，防反光亚克力玻璃，悬挂或立式两用。" data-quality="实木框架|防反光玻璃|立挂两用" data-category="home">
+                        <div class="relative">
+                            <div class="h-28 overflow-hidden bg-gradient-to-br from-indigo-50 to-gray-50">
+                                <img src="https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?q=80&w=250" alt="定制相框" class="w-full h-full object-cover hover:opacity-90 transition-opacity">
+                            </div>
+                        </div>
+                        <div class="p-2.5">
+                            <h3 class="text-xs font-medium text-gray-800 line-clamp-1">定制相框</h3>
+                            <div class="flex justify-between items-center mt-1.5">
+                                <span class="text-red-600 text-xs font-bold">¥79.00</span>
+                                <div class="flex items-center text-[10px] text-amber-500">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 热门产品推荐 -->
+                <div class="mb-2">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center">
+                            <span class="w-1 h-4 bg-indigo-600 rounded-full mr-1.5"></span>
+                            <p class="text-xs font-medium text-gray-700">热门推荐</p>
+                        </div>
+                        <a href="hot-products-list.html" class="text-xs text-indigo-600 flex items-center">
+                            查看更多 <i class="fas fa-chevron-right ml-0.5 text-[9px]"></i>
+                        </a>
+                    </div>
+                    
+                    <!-- 可滚动热门产品区域 -->
+                    <div class="relative overflow-hidden">
+                        <!-- 滚动阴影指示器 -->
+                        <div class="absolute left-0 top-1/2 transform -translate-y-1/2 bg-gradient-to-r from-gray-50 via-gray-50/80 to-transparent w-12 h-16 z-10 pointer-events-none"></div>
+                        <div class="absolute right-0 top-1/2 transform -translate-y-1/2 bg-gradient-to-l from-gray-50 via-gray-50/80 to-transparent w-12 h-16 z-10 pointer-events-none"></div>
+                        
+                        <!-- 横向滚动容器 - 自动滚动 -->
+                        <div class="flex whitespace-nowrap animate-scroll pb-2 overflow-hidden" style="animation: productScroll 30s linear infinite;">
+                            <!-- 热门产品项 - 第一组 -->
+                            <div class="inline-flex gap-3 mx-1">
+                                <div class="flex-shrink-0 w-32 bg-white rounded-lg overflow-hidden shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-300">
+                                    <img src="https://images.unsplash.com/photo-1618354691792-d1d42acfd860?q=80&w=200" alt="热门产品1" class="w-full h-16 object-cover">
+                                    <div class="p-2">
+                                        <h3 class="text-xs font-medium text-gray-800 line-clamp-1">情侣T恤套装</h3>
+                                        <div class="flex justify-between items-center mt-1">
+                                            <span class="text-red-600 text-xs font-bold">¥88.00</span>
+                                            <span class="text-[10px] text-gray-500">1200+人付款</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex-shrink-0 w-32 bg-white rounded-lg overflow-hidden shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-300">
+                                    <img src="https://images.unsplash.com/photo-1541643600914-78b084683601?q=80&w=200" alt="热门产品2" class="w-full h-16 object-cover">
+                                    <div class="p-2">
+                                        <h3 class="text-xs font-medium text-gray-800 line-clamp-1">创意马克杯</h3>
+                                        <div class="flex justify-between items-center mt-1">
+                                            <span class="text-red-600 text-xs font-bold">¥49.00</span>
+                                            <span class="text-[10px] text-gray-500">890+人付款</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex-shrink-0 w-32 bg-white rounded-lg overflow-hidden shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-300">
+                                    <img src="https://images.unsplash.com/photo-1625946094903-4ae89261d41c?q=80&w=200" alt="热门产品3" class="w-full h-16 object-cover">
+                                    <div class="p-2">
+                                        <h3 class="text-xs font-medium text-gray-800 line-clamp-1">个性帆布袋</h3>
+                                        <div class="flex justify-between items-center mt-1">
+                                            <span class="text-red-600 text-xs font-bold">¥35.00</span>
+                                            <span class="text-[10px] text-gray-500">756+人付款</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex-shrink-0 w-32 bg-white rounded-lg overflow-hidden shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-300">
+                                    <img src="https://images.unsplash.com/photo-1597248881519-db089d3744a5?q=80&w=200" alt="热门产品4" class="w-full h-16 object-cover">
+                                    <div class="p-2">
+                                        <h3 class="text-xs font-medium text-gray-800 line-clamp-1">宠物定制项圈</h3>
+                                        <div class="flex justify-between items-center mt-1">
+                                            <span class="text-red-600 text-xs font-bold">¥68.00</span>
+                                            <span class="text-[10px] text-gray-500">480+人付款</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex-shrink-0 w-32 bg-white rounded-lg overflow-hidden shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-300">
+                                    <div class="relative">
+                                        <img src="https://images.unsplash.com/photo-1606220588913-b3aacb4d2f46?q=80&w=200" alt="热门产品5" class="w-full h-16 object-cover">
+                                        <span class="absolute top-1 right-1 bg-red-500 text-white text-[8px] px-1 rounded">HOT</span>
+                                    </div>
+                                    <div class="p-2">
+                                        <h3 class="text-xs font-medium text-gray-800 line-clamp-1">定制手机壳</h3>
+                                        <div class="flex justify-between items-center mt-1">
+                                            <span class="text-red-600 text-xs font-bold">¥29.00</span>
+                                            <span class="text-[10px] text-gray-500">2100+人付款</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 热门产品项 - 第二组（重复，实现无缝滚动） -->
+                            <div class="inline-flex gap-3 mx-1">
+                                <div class="flex-shrink-0 w-32 bg-white rounded-lg overflow-hidden shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-300">
+                                    <img src="https://images.unsplash.com/photo-1618354691792-d1d42acfd860?q=80&w=200" alt="热门产品1" class="w-full h-16 object-cover">
+                                    <div class="p-2">
+                                        <h3 class="text-xs font-medium text-gray-800 line-clamp-1">情侣T恤套装</h3>
+                                        <div class="flex justify-between items-center mt-1">
+                                            <span class="text-red-600 text-xs font-bold">¥88.00</span>
+                                            <span class="text-[10px] text-gray-500">1200+人付款</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex-shrink-0 w-32 bg-white rounded-lg overflow-hidden shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-300">
+                                    <img src="https://images.unsplash.com/photo-1541643600914-78b084683601?q=80&w=200" alt="热门产品2" class="w-full h-16 object-cover">
+                                    <div class="p-2">
+                                        <h3 class="text-xs font-medium text-gray-800 line-clamp-1">创意马克杯</h3>
+                                        <div class="flex justify-between items-center mt-1">
+                                            <span class="text-red-600 text-xs font-bold">¥49.00</span>
+                                            <span class="text-[10px] text-gray-500">890+人付款</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex-shrink-0 w-32 bg-white rounded-lg overflow-hidden shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-300">
+                                    <img src="https://images.unsplash.com/photo-1625946094903-4ae89261d41c?q=80&w=200" alt="热门产品3" class="w-full h-16 object-cover">
+                                    <div class="p-2">
+                                        <h3 class="text-xs font-medium text-gray-800 line-clamp-1">个性帆布袋</h3>
+                                        <div class="flex justify-between items-center mt-1">
+                                            <span class="text-red-600 text-xs font-bold">¥35.00</span>
+                                            <span class="text-[10px] text-gray-500">756+人付款</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex-shrink-0 w-32 bg-white rounded-lg overflow-hidden shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-300">
+                                    <img src="https://images.unsplash.com/photo-1597248881519-db089d3744a5?q=80&w=200" alt="热门产品4" class="w-full h-16 object-cover">
+                                    <div class="p-2">
+                                        <h3 class="text-xs font-medium text-gray-800 line-clamp-1">宠物定制项圈</h3>
+                                        <div class="flex justify-between items-center mt-1">
+                                            <span class="text-red-600 text-xs font-bold">¥68.00</span>
+                                            <span class="text-[10px] text-gray-500">480+人付款</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex-shrink-0 w-32 bg-white rounded-lg overflow-hidden shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-300">
+                                    <div class="relative">
+                                        <img src="https://images.unsplash.com/photo-1606220588913-b3aacb4d2f46?q=80&w=200" alt="热门产品5" class="w-full h-16 object-cover">
+                                        <span class="absolute top-1 right-1 bg-red-500 text-white text-[8px] px-1 rounded">HOT</span>
+                                    </div>
+                                    <div class="p-2">
+                                        <h3 class="text-xs font-medium text-gray-800 line-clamp-1">定制手机壳</h3>
+                                        <div class="flex justify-between items-center mt-1">
+                                            <span class="text-red-600 text-xs font-bold">¥29.00</span>
+                                            <span class="text-[10px] text-gray-500">2100+人付款</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Step 3: 语言描述 -->
+            <div class="space-y-3">
+                <h2 class="text-sm font-semibold text-gray-700 flex items-center">
+                    <span class="flex items-center justify-center w-5 h-5 bg-indigo-600 text-white rounded-full text-xs mr-2">3</span>
+                    语言描述
+                </h2>
+                
+                <!-- 描述输入区 -->
+                <div class="space-y-3">
+                    <div class="bg-white rounded-lg p-3 border border-gray-200 relative">
+                        <textarea id="productDescription" rows="4" placeholder="描述您希望的产品效果，风格，图案等..." 
+                            class="w-full text-sm text-gray-700 outline-none resize-none"></textarea>
+                        
+                        <button id="voiceInputBtn" class="absolute top-3 right-3 flex items-center justify-center w-8 h-8 rounded-full text-gray-500 hover:bg-gray-100">
+                            <i class="fas fa-microphone"></i>
+                        </button>
+                        
+                        <div class="flex justify-end items-center mt-2 pt-2 border-t border-gray-100">
+                            <span id="charCount" class="text-xs text-gray-400">0/200</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Step 4: 生成预览 -->
+            <div class="space-y-3">
+                <h2 class="text-sm font-semibold text-gray-700 flex items-center">
+                    <span class="flex items-center justify-center w-5 h-5 bg-indigo-600 text-white rounded-full text-xs mr-2">4</span>
+                    生成预览
+                </h2>
+                
+                <!-- 生成进度条 (默认隐藏) -->
+                <div id="generationProgress" class="hidden space-y-2">
+                    <div class="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                        <div id="progressBar" class="h-full bg-indigo-600 rounded-full" style="width: 0%"></div>
+                    </div>
+                    <div class="flex justify-between text-xs text-gray-500">
+                        <span>AI生成中...</span>
+                        <span id="progressPercent">0%</span>
+                    </div>
+                </div>
+                
+                <button id="previewBtn" class="w-full py-3 bg-indigo-600 text-white rounded-lg text-sm font-medium flex items-center justify-center shadow-md hover:bg-indigo-700 transition-colors">
+                    <i class="fas fa-magic mr-2"></i> 生成预览图
+                </button>
+                
+                <!-- 产品参考示例 -->
+                <div class="mt-4">
+                    <p class="text-xs text-gray-500 mb-2">参考示例</p>
+                    <div class="grid grid-cols-4 gap-2">
+                        <div class="rounded-lg overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1589782182703-2aaa69037b5b?q=80&w=100" alt="参考1" class="w-full h-16 object-cover">
+                        </div>
+                        <div class="rounded-lg overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1607345366928-199ea26cfe3e?q=80&w=100" alt="参考2" class="w-full h-16 object-cover">
+                        </div>
+                        <div class="rounded-lg overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1583744946564-b52ac1c389c8?q=80&w=100" alt="参考3" class="w-full h-16 object-cover">
+                        </div>
+                        <div class="rounded-lg overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?q=80&w=100" alt="参考4" class="w-full h-16 object-cover">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Step 5: 预览结果 - 默认隐藏 -->
+            <div id="productPreview" class="space-y-3 hidden">
+                <h2 class="text-sm font-semibold text-gray-700 flex items-center">
+                    <span class="flex items-center justify-center w-5 h-5 bg-indigo-600 text-white rounded-full text-xs mr-2">5</span>
+                    调整满意
+                </h2>
+                
+                <!-- 结果预览 -->
+                <div class="bg-white rounded-lg overflow-hidden border border-gray-200 shadow-md">
+                    <div class="relative">
+                        <img id="generatedImage" src="https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?q=80&w=500" alt="生成的产品图" class="w-full object-cover">
+                        
+                        <!-- 产品预览小标签 -->
+                        <div class="absolute top-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded-full">
+                            AI生成效果
+                        </div>
+                        
+                        <!-- 预览标记 -->
+                        <div class="absolute -bottom-2 left-0 right-0 flex justify-center">
+                            <div class="bg-indigo-600 text-white px-3 py-1 rounded-full text-xs shadow-lg">
+                                预览效果
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="p-3 border-t border-gray-100">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="text-sm font-medium text-gray-800" id="generatedProductName">定制T恤</p>
+                                <div class="flex items-center mt-1">
+                                    <span class="text-red-600 text-sm font-bold" id="generatedProductPrice">¥49.00</span>
+                                    <span class="ml-2 text-xs text-gray-400 line-through">¥69.00</span>
+                                    <span class="ml-2 bg-red-100 text-red-600 text-[10px] px-1 rounded">限时优惠</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center text-amber-400 text-xs">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                                <span class="ml-1 text-gray-500">4.8</span>
+                            </div>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2" id="generatedProductDescription">个性化定制T恤，采用优质纯棉面料，舒适透气，专属个性定制图案。</p>
+                    </div>
+                    
+                    <!-- 材质和规格 -->
+                    <div class="p-3 border-t border-gray-100 bg-gray-50">
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-2 py-0.5 bg-white text-gray-600 text-xs rounded-full border border-gray-200">优质纯棉</span>
+                            <span class="px-2 py-0.5 bg-white text-gray-600 text-xs rounded-full border border-gray-200">环保印染</span>
+                            <span class="px-2 py-0.5 bg-white text-gray-600 text-xs rounded-full border border-gray-200">耐洗不掉色</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 操作按钮 -->
+                <div class="grid grid-cols-2 gap-3">
+                    <button id="regenerateBtn" class="py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-medium flex items-center justify-center shadow-sm hover:bg-gray-50 transition-colors">
+                        <i class="fas fa-redo mr-1.5"></i> 重新生成
+                    </button>
+                    <button id="satisfiedBtn" class="py-2.5 bg-indigo-600 text-white rounded-lg text-sm font-medium flex items-center justify-center shadow-md hover:bg-indigo-700 transition-colors">
+                        <i class="fas fa-check mr-1.5"></i> 很满意
+                    </button>
+                </div>
+                
+                <!-- 滑动查看更多款式 -->
+                <div class="mt-3">
+                    <p class="text-xs text-gray-500 mb-2 flex items-center">
+                        <i class="fas fa-hand-point-right text-indigo-400 mr-1"></i>
+                        滑动查看其他风格
+                    </p>
+                    <div class="flex overflow-x-auto no-scrollbar pb-2 gap-3">
+                        <div class="flex-shrink-0 w-16 h-16 rounded-lg border-2 border-indigo-500 overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?q=80&w=100" alt="当前风格" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex-shrink-0 w-16 h-16 rounded-lg border border-gray-200 overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1618354691792-d1d42acfd860?q=80&w=100" alt="风格2" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex-shrink-0 w-16 h-16 rounded-lg border border-gray-200 overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1576566588028-4147f3842f27?q=80&w=100" alt="风格3" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex-shrink-0 w-16 h-16 rounded-lg border border-gray-200 overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?q=80&w=100" alt="风格4" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex-shrink-0 w-16 h-16 rounded-lg border border-gray-200 overflow-hidden bg-gray-100 flex items-center justify-center">
+                            <i class="fas fa-plus text-gray-400"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Step 6: 下单 - 默认隐藏 -->
+            <div id="checkoutSection" class="space-y-3 hidden">
+                <h2 class="text-sm font-semibold text-gray-700 flex items-center">
+                    <span class="flex items-center justify-center w-5 h-5 bg-indigo-600 text-white rounded-full text-xs mr-2">6</span>
+                    确认下单
+                </h2>
+                
+                <!-- 产品信息卡片 -->
+                <div class="bg-white rounded-lg overflow-hidden border border-gray-200 shadow-md">
+                    <div class="flex p-3">
+                        <div class="w-20 h-20 rounded-lg overflow-hidden mr-3 border border-gray-200">
+                            <img src="https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?q=80&w=200" alt="最终产品" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-sm font-medium text-gray-800" id="selectedProduct">定制T恤</h3>
+                            <div class="flex items-center mt-1">
+                                <span class="text-sm font-bold text-red-600" id="selectedPrice">¥49.00</span>
+                                <span class="ml-2 text-xs text-gray-400 line-through">¥69.00</span>
+                                <span class="ml-2 bg-red-50 text-red-500 text-[10px] rounded px-1">省¥20</span>
+                            </div>
+                            <div class="flex justify-between items-center mt-2">
+                                <div class="flex items-center text-xs text-gray-500">
+                                    <span>规格：</span>
+                                    <span class="ml-1 text-gray-700">M号 / 白色</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <button class="w-6 h-6 rounded-full bg-gray-100 border border-gray-300 flex items-center justify-center text-gray-600">-</button>
+                                    <span class="mx-2 text-sm">1</span>
+                                    <button class="w-6 h-6 rounded-full bg-gray-100 border border-gray-300 flex items-center justify-center text-gray-600">+</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 规格选择区 -->
+                    <div class="border-t border-gray-100 p-3 bg-gray-50">
+                        <p class="text-xs text-gray-600 mb-2">尺码选择</p>
+                        <div class="flex flex-wrap gap-2 mb-3">
+                            <button class="px-3 py-1 border border-gray-300 bg-white rounded-lg text-xs">S</button>
+                            <button class="px-3 py-1 border border-indigo-500 bg-indigo-50 text-indigo-600 rounded-lg text-xs">M</button>
+                            <button class="px-3 py-1 border border-gray-300 bg-white rounded-lg text-xs">L</button>
+                            <button class="px-3 py-1 border border-gray-300 bg-white rounded-lg text-xs">XL</button>
+                        </div>
+                        
+                        <p class="text-xs text-gray-600 mb-2">颜色选择</p>
+                        <div class="flex flex-wrap gap-2">
+                            <button class="px-3 py-1 border border-indigo-500 bg-indigo-50 text-indigo-600 rounded-lg text-xs flex items-center">
+                                <span class="w-3 h-3 rounded-full bg-white mr-1.5"></span>白色
+                            </button>
+                            <button class="px-3 py-1 border border-gray-300 bg-white rounded-lg text-xs flex items-center">
+                                <span class="w-3 h-3 rounded-full bg-black mr-1.5"></span>黑色
+                            </button>
+                            <button class="px-3 py-1 border border-gray-300 bg-white rounded-lg text-xs flex items-center">
+                                <span class="w-3 h-3 rounded-full bg-gray-300 mr-1.5"></span>灰色
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 配送信息 -->
+                <div class="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
+                    <div class="p-3 flex items-center justify-between">
+                        <div class="flex items-center">
+                            <i class="fas fa-map-marker-alt text-red-500 mr-2"></i>
+                            <div>
+                                <p class="text-sm text-gray-800">北京市朝阳区国贸花园小区1栋3单元</p>
+                                <p class="text-xs text-gray-500 mt-0.5">张明 (先生) 138****5678</p>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-right text-gray-400 text-xs"></i>
+                    </div>
+                </div>
+                
+                <!-- 支付方式 -->
+                <div class="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
+                    <div class="p-3 flex items-center justify-between">
+                        <div class="flex items-center">
+                            <i class="fab fa-weixin text-green-500 text-lg mr-2"></i>
+                            <p class="text-sm text-gray-800">微信支付</p>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-xs text-gray-500 mr-2">推荐</span>
+                            <i class="fas fa-check-circle text-green-500"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 下单按钮 -->
+                <div class="mt-6">
+                    <div class="flex items-center justify-between bg-white rounded-lg p-3 border border-gray-200 shadow-lg mb-2">
+                        <div>
+                            <p class="text-xs text-gray-500">总计:</p>
+                            <p class="text-lg font-bold text-red-600">¥49.00</p>
+                        </div>
+                        <button id="checkoutBtn" class="py-3 px-6 bg-gradient-to-r from-amber-500 to-red-500 text-white rounded-lg text-sm font-medium flex items-center justify-center shadow-lg hover:from-amber-600 hover:to-red-600 transition-all">
+                            <i class="fas fa-shopping-cart mr-2"></i> 一键下单
+                        </button>
+                    </div>
+                    <p class="text-[10px] text-center text-gray-400">点击下单即表示您同意《购买协议》与《隐私条款》</p>
+                </div>
+            </div>
+        </main>
+
+        <!-- 统一的底部导航栏 - 样式与index.html中完全相同 -->
+        <div id="unifiedBottomNav" class="h-[83px] bg-white border-t border-gray-200 flex justify-around items-center fixed bottom-0 left-0 right-0" style="display: none;">
+            <a href="home.html" class="flex flex-col items-center justify-center w-1/5 text-gray-400">
+                <i class="fas fa-home text-2xl mb-1"></i>
+                <span class="text-xs">首页</span>
+            </a>
+            <a href="works.html" class="flex flex-col items-center justify-center w-1/5 text-gray-400">
+                <i class="fas fa-compass text-2xl mb-1"></i>
+                <span class="text-xs">热门</span>
+            </a>
+            <a href="shop.html" class="flex flex-col items-center justify-center w-1/5 text-[#007aff]">
+                <i class="fas fa-store text-2xl mb-1"></i>
+                <span class="text-xs">商城</span>
+            </a>
+            <a href="me.html" class="flex flex-col items-center justify-center w-1/5 text-gray-400">
+                <i class="fas fa-user text-2xl mb-1"></i>
+                <span class="text-xs">我的</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- 产品详情页面 - 默认隐藏 -->
+    <div id="productDetailPage" class="fixed inset-0 bg-white z-50 hidden">
+        <div class="h-full flex flex-col">
+            <!-- 顶部导航栏 -->
+            <div class="px-4 py-3 bg-white border-b flex items-center justify-between">
+                <button id="backToShopBtn" class="flex items-center text-gray-600">
+                    <i class="fas fa-chevron-left mr-2"></i>
+                    <span>返回商城</span>
+                </button>
+                <button class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100">
+                    <i class="fas fa-share-alt text-gray-600"></i>
+                </button>
+            </div>
+            
+            <!-- 产品详情内容 -->
+            <div class="flex-1 overflow-y-auto">
+                <!-- 产品图片 -->
+                <div class="relative">
+                    <div class="w-full h-64 bg-gray-100 flex items-center justify-center">
+                        <img id="detailProductImage" src="" alt="产品图片" class="w-full h-full object-contain">
+                    </div>
+                    <div class="absolute bottom-2 right-2 flex space-x-1">
+                        <span class="w-2 h-2 rounded-full bg-white opacity-80"></span>
+                        <span class="w-2 h-2 rounded-full bg-white"></span>
+                        <span class="w-2 h-2 rounded-full bg-white opacity-60"></span>
+                    </div>
+                </div>
+                
+                <!-- 产品信息 -->
+                <div class="p-4 bg-white">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h1 id="detailProductName" class="text-lg font-bold text-gray-800">产品名称</h1>
+                            <p id="detailProductPrice" class="text-red-600 text-lg font-bold mt-1">¥0.00</p>
+                        </div>
+                        <div class="bg-red-50 text-red-600 px-2 py-1 rounded text-xs font-medium">
+                            热销爆款
+                        </div>
+                    </div>
+                    
+                    <!-- 产品描述 -->
+                    <div class="mt-4">
+                        <h2 class="text-sm font-semibold text-gray-700">产品详情</h2>
+                        <p id="detailProductDesc" class="text-sm text-gray-600 mt-2 leading-relaxed">产品描述内容...</p>
+                    </div>
+                    
+                    <!-- 产品品质 -->
+                    <div class="mt-4">
+                        <h2 class="text-sm font-semibold text-gray-700">产品品质</h2>
+                        <div id="productQualityTags" class="flex flex-wrap gap-2 mt-2">
+                            <!-- 品质标签由JS动态生成 -->
+                        </div>
+                    </div>
+                    
+                    <!-- 规格选择 -->
+                    <div class="mt-4">
+                        <h2 class="text-sm font-semibold text-gray-700">规格选择</h2>
+                        <div class="mt-2 space-y-3">
+                            <!-- 尺寸选择 -->
+                            <div>
+                                <p class="text-xs text-gray-500 mb-1">尺寸</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <button class="px-3 py-1 border border-gray-300 rounded-lg text-xs bg-white">S</button>
+                                    <button class="px-3 py-1 border border-indigo-500 rounded-lg text-xs bg-indigo-50 text-indigo-600">M</button>
+                                    <button class="px-3 py-1 border border-gray-300 rounded-lg text-xs bg-white">L</button>
+                                    <button class="px-3 py-1 border border-gray-300 rounded-lg text-xs bg-white">XL</button>
+                                </div>
+                            </div>
+                            
+                            <!-- 颜色选择 -->
+                            <div>
+                                <p class="text-xs text-gray-500 mb-1">颜色</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <button class="px-3 py-1 border border-gray-300 rounded-lg text-xs bg-white">白色</button>
+                                    <button class="px-3 py-1 border border-indigo-500 rounded-lg text-xs bg-indigo-50 text-indigo-600">黑色</button>
+                                    <button class="px-3 py-1 border border-gray-300 rounded-lg text-xs bg-white">蓝色</button>
+                                    <button class="px-3 py-1 border border-gray-300 rounded-lg text-xs bg-white">红色</button>
+                                </div>
+                            </div>
+                            
+                            <!-- 数量选择 -->
+                            <div>
+                                <p class="text-xs text-gray-500 mb-1">数量</p>
+                                <div class="flex items-center w-1/3">
+                                    <button class="w-8 h-8 rounded border border-gray-300 flex items-center justify-center text-gray-600">-</button>
+                                    <input type="number" value="1" min="1" class="w-12 h-8 text-center border-t border-b border-gray-300 text-sm">
+                                    <button class="w-8 h-8 rounded border border-gray-300 flex items-center justify-center text-gray-600">+</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 推荐搭配 -->
+                <div class="p-4 mt-2 bg-white">
+                    <h2 class="text-sm font-semibold text-gray-700">推荐搭配</h2>
+                    <div class="flex overflow-x-auto no-scrollbar mt-2 pb-2 gap-3">
+                        <div class="flex-shrink-0 w-28">
+                            <div class="w-28 h-28 bg-gray-100 rounded-lg overflow-hidden">
+                                <img src="https://images.unsplash.com/photo-1576566588028-4147f3842f27?q=80&w=200" alt="相关产品" class="w-full h-full object-cover">
+                            </div>
+                            <p class="text-xs text-center mt-1 text-gray-700">同款不同色</p>
+                        </div>
+                        <div class="flex-shrink-0 w-28">
+                            <div class="w-28 h-28 bg-gray-100 rounded-lg overflow-hidden">
+                                <img src="https://images.unsplash.com/photo-1618354691792-d1d42acfd860?q=80&w=200" alt="相关产品" class="w-full h-full object-cover">
+                            </div>
+                            <p class="text-xs text-center mt-1 text-gray-700">情侣款</p>
+                        </div>
+                        <div class="flex-shrink-0 w-28">
+                            <div class="w-28 h-28 bg-gray-100 rounded-lg overflow-hidden">
+                                <img src="https://images.unsplash.com/photo-1541643600914-78b084683601?q=80&w=200" alt="相关产品" class="w-full h-full object-cover">
+                            </div>
+                            <p class="text-xs text-center mt-1 text-gray-700">套装优惠</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 底部操作栏 -->
+            <div class="p-4 border-t bg-white flex items-center">
+                <div class="flex-1 flex items-center space-x-4">
+                    <button class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
+                        <i class="fas fa-heart text-gray-400"></i>
+                    </button>
+                    <button class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center relative">
+                        <i class="fas fa-shopping-cart text-gray-400"></i>
+                        <span class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-white text-[10px] flex items-center justify-center">2</span>
+                    </button>
+                </div>
+                <div class="flex-1 flex items-center space-x-2">
+                    <button class="flex-1 py-2.5 bg-indigo-100 text-indigo-600 rounded-lg text-sm font-medium">
+                        加入购物车
+                    </button>
+                    <button class="flex-1 py-2.5 bg-indigo-600 text-white rounded-lg text-sm font-medium">
+                        立即购买
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 检测是否在iframe中加载
+            const isInIframe = window.self !== window.top;
+            const unifiedBottomNav = document.getElementById('unifiedBottomNav');
+            
+            // 如果不在iframe中，显示统一导航栏
+            if (!isInIframe && unifiedBottomNav) {
+                unifiedBottomNav.style.display = 'flex';
+                
+                // 配置导航点击事件
+                setupNavigation();
+            }
+            
+            // 设置导航栏点击事件处理函数
+            function setupNavigation() {
+                const navLinks = unifiedBottomNav.querySelectorAll('a');
+                
+                navLinks.forEach(link => {
+                    link.addEventListener('click', function(e) {
+                        // 阻止默认行为，手动处理导航
+                        e.preventDefault();
+                        
+                        // 获取目标页面
+                        const href = this.getAttribute('href');
+                        
+                        // 跳转到目标页面
+                        window.location.href = href;
+                    });
+                });
+            }
+            
+            // 文件上传处理
+            const photoUpload = document.getElementById('photoUpload');
+            const photoSelectArea = document.getElementById('photoSelectArea');
+            const photoPreviewArea = document.getElementById('photoPreviewArea');
+            const selectedImage = document.getElementById('selectedImage');
+            const changePhotoBtn = document.getElementById('changePhotoBtn');
+            
+            // 产品描述文本区域计数
+            const productDescription = document.getElementById('productDescription');
+            const charCount = document.getElementById('charCount');
+            
+            // 按钮和容器
+            const previewBtn = document.getElementById('previewBtn');
+            const regenerateBtn = document.getElementById('regenerateBtn');
+            const satisfiedBtn = document.getElementById('satisfiedBtn');
+            const productPreview = document.getElementById('productPreview');
+            const checkoutSection = document.getElementById('checkoutSection');
+            const checkoutBtn = document.getElementById('checkoutBtn');
+            const productDetailPage = document.getElementById('productDetailPage');
+            
+            // 产品信息
+            const selectedProduct = document.getElementById('selectedProduct');
+            const selectedPrice = document.getElementById('selectedPrice');
+            const generatedProductName = document.getElementById('generatedProductName');
+            const generatedProductPrice = document.getElementById('generatedProductPrice');
+            
+            // 导航栏管理函数 - 防止导航栏重复出现
+            function manageNavbarVisibility(action) {
+                // 删除此函数，因为不再需要管理导航栏
+            }
+            
+            // 初始化页面状态
+            function initPageState() {
+                // 删除这个函数，不再需要
+            }
+            
+            // 页面加载完成后初始化状态
+            // 删除调用initPageState()
+            
+            // 照片上传处理
+            if (photoUpload) {
+                photoUpload.addEventListener('change', function(e) {
+                    if (e.target.files.length > 0) {
+                        const file = e.target.files[0];
+                        const url = URL.createObjectURL(file);
+                        selectedImage.src = url;
+                        photoSelectArea.classList.add('hidden');
+                        photoPreviewArea.classList.remove('hidden');
+                    }
+                });
+            }
+            
+            // 更换照片按钮
+            if (changePhotoBtn) {
+                changePhotoBtn.addEventListener('click', function() {
+                    photoUpload.click();
+                });
+            }
+            
+            // 文字计数器
+            if (productDescription) {
+                productDescription.addEventListener('input', function() {
+                    const length = this.value.length;
+                    charCount.textContent = `${length}/200`;
+                    
+                    if (length > 200) {
+                        charCount.classList.add('text-red-500');
+                    } else {
+                        charCount.classList.remove('text-red-500');
+                    }
+                });
+            }
+            
+            // 高亮产品卡 & 更新订单信息
+            document.querySelectorAll('.product-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    document.querySelectorAll('.product-card').forEach(c => 
+                        c.classList.remove('border-indigo-500', 'text-indigo-600'));
+                    
+                    card.classList.add('border-indigo-500', 'text-indigo-600');
+                    
+                    // 更新显示的产品信息
+                    const productName = this.getAttribute('data-name');
+                    const productPrice = this.getAttribute('data-price');
+                    
+                    selectedProduct.textContent = productName;
+                    selectedPrice.textContent = '¥' + productPrice + '.00';
+                    generatedProductName.textContent = productName;
+                    generatedProductPrice.textContent = '¥' + productPrice + '.00';
+                });
+            });
+            
+            // 点击"生成预览图"→ 显示预览区 + 结算区
+            if (previewBtn) {
+                previewBtn.addEventListener('click', function() {
+                    productPreview.classList.remove('hidden');
+                    checkoutSection.classList.remove('hidden');
+                    // 滚动到预览区
+                    productPreview.scrollIntoView({ behavior: 'smooth' });
+                });
+            }
+            
+            // 重新生成按钮
+            if (regenerateBtn) {
+                regenerateBtn.addEventListener('click', function() {
+                    // 隐藏预览结果
+                    productPreview.classList.add('hidden');
+                    
+                    // 跳转到第3步（语言描述）
+                    // 查找第3步区域 - 使用更兼容的选择器
+                    const stepHeaders = document.querySelectorAll('.space-y-3 h2');
+                    let languageDescriptionSection = null;
+                    
+                    for (let i = 0; i < stepHeaders.length; i++) {
+                        const numberSpan = stepHeaders[i].querySelector('span');
+                        if (numberSpan && numberSpan.textContent.includes('3')) {
+                            languageDescriptionSection = stepHeaders[i].closest('.space-y-3');
+                            break;
+                        }
+                    }
+                    
+                    if (languageDescriptionSection) {
+                        languageDescriptionSection.scrollIntoView({ behavior: 'smooth' });
+                    }
+                    
+                    // 聚焦到文本区域
+                    if (productDescription) {
+                        setTimeout(() => productDescription.focus(), 500);
+                    }
+                });
+            }
+            
+            // 很满意按钮
+            if (satisfiedBtn) {
+                satisfiedBtn.addEventListener('click', function() {
+                    // 滚动到下单区域
+                    checkoutSection.scrollIntoView({ behavior: 'smooth' });
+                    
+                    // 如果不在iframe中，检查是否需要隐藏导航栏
+                    if (window.self === window.top && unifiedBottomNav && !checkoutSection.classList.contains('hidden')) {
+                        // 在结账页面可以选择隐藏导航栏以提供更多空间
+                        unifiedBottomNav.style.display = 'none';
+                    }
+                });
+            }
+            
+            // 麦克风录音事件（示例实现）
+            const voiceInputBtn = document.getElementById('voiceInputBtn');
+            if (voiceInputBtn) {
+                voiceInputBtn.addEventListener('click', function() {
+                    alert('开始语音输入');
+                    // 实际项目中这里需要实现语音输入功能
+                });
+            }
+            
+            // 取拍照事件（示例实现）
+            const takePhotoBtn = document.getElementById('takePhotoBtn');
+            if (takePhotoBtn) {
+                takePhotoBtn.addEventListener('click', function() {
+                    alert('调用设备相机功能');
+                    // 实际项目中这里需要调用相机API
+                });
+            }
+            
+            // 初始状态下，默认选中第一个产品
+            const firstProduct = document.querySelector('.product-card');
+            if (firstProduct) {
+                firstProduct.classList.add('border-indigo-500', 'text-indigo-600');
+                
+                // 更新产品信息
+                const productName = firstProduct.getAttribute('data-name');
+                const productPrice = firstProduct.getAttribute('data-price');
+                
+                if (selectedProduct) selectedProduct.textContent = productName;
+                if (selectedPrice) selectedPrice.textContent = '¥' + productPrice + '.00';
+                if (generatedProductName) generatedProductName.textContent = productName;
+                if (generatedProductPrice) generatedProductPrice.textContent = '¥' + productPrice + '.00';
+            }
+            
+            // 如果页面是作为独立页面打开的，显示预览容器
+            if (window.location.search.includes('preview=true')) {
+                document.querySelector('.preview-container').style.display = 'flex';
+                
+                // 复制内容到预览框 - 这里需要确保不会复制额外的导航栏
+                const content = document.querySelector('.w-full.h-full.bg-white').cloneNode(true);
+                
+                // 移除导航栏副本，避免重复
+                const duplicateNavbars = content.querySelectorAll('[id="mainBottomNavbar"]');
+                if (duplicateNavbars.length > 1) {
+                    // 保留一个导航栏，删除其他的
+                    for (let i = 1; i < duplicateNavbars.length; i++) {
+                        duplicateNavbars[i].remove();
+                    }
+                }
+                
+                document.querySelector('.preview-container .mx-auto.my-6').appendChild(content);
+            }
+
+            // 产品卡点击事件 - 显示产品详情页
+            document.querySelectorAll('.product-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    // 获取产品信息
+                    const productName = this.getAttribute('data-name');
+                    const productPrice = this.getAttribute('data-price');
+                    const productDesc = this.getAttribute('data-desc');
+                    const productQuality = this.getAttribute('data-quality');
+                    const productImg = this.querySelector('img').src;
+                    
+                    // 填充详情页内容
+                    document.getElementById('detailProductName').textContent = productName;
+                    document.getElementById('detailProductPrice').textContent = '¥' + productPrice + '.00';
+                    document.getElementById('detailProductDesc').textContent = productDesc;
+                    document.getElementById('detailProductImage').src = productImg;
+                    
+                    // 创建品质标签
+                    const qualityTags = document.getElementById('productQualityTags');
+                    qualityTags.innerHTML = '';
+                    
+                    if (productQuality) {
+                        const tags = productQuality.split('|');
+                        tags.forEach(tag => {
+                            const tagEl = document.createElement('span');
+                            tagEl.className = 'px-2 py-1 bg-gray-100 text-gray-700 rounded-lg text-xs';
+                            tagEl.textContent = tag;
+                            qualityTags.appendChild(tagEl);
+                        });
+                    }
+                    
+                    // 显示详情页
+                    document.getElementById('productDetailPage').classList.remove('hidden');
+                    
+                    // 如果不在iframe中，隐藏导航栏
+                    if (window.self === window.top && unifiedBottomNav) {
+                        unifiedBottomNav.style.display = 'none';
+                    }
+                });
+            });
+            
+            // 返回按钮点击事件
+            const backToShopBtn = document.getElementById('backToShopBtn');
+            if (backToShopBtn) {
+                backToShopBtn.addEventListener('click', function() {
+                    document.getElementById('productDetailPage').classList.add('hidden');
+                    
+                    // 如果不在iframe中，重新显示导航栏
+                    if (window.self === window.top && unifiedBottomNav) {
+                        unifiedBottomNav.style.display = 'flex';
+                    }
+                });
+            }
+            
+            // 为产品卡片添加过渡效果
+            document.querySelectorAll('.product-card').forEach(card => {
+                card.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                card.style.opacity = '1';
+            });
+
+            // 点击"一键下单"按钮
+            if (checkoutBtn) {
+                checkoutBtn.addEventListener('click', function() {
+                    // 获取商品信息
+                    const productName = document.getElementById('selectedProduct').textContent || '定制T恤';
+                    const productPrice = document.getElementById('selectedPrice').textContent.replace('¥', '').replace('.00', '') || '49';
+                    const productSpec = 'M号 / 白色'; // 可以根据实际选择获取
+                    
+                    // 构造URL参数
+                    const params = 'productName=' + encodeURIComponent(productName) + 
+                                  '&productPrice=' + encodeURIComponent(productPrice) + 
+                                  '&productSpec=' + encodeURIComponent(productSpec);
+                    
+                    // 检查是否在iframe中
+                    const isInIframe = window.self !== window.top;
+                    
+                    if (isInIframe) {
+                        // 如果在iframe中，尝试在父窗口中打开payment.html
+                        try {
+                            // 方式1：如果父窗口有navigateTo函数，尝试调用
+                            if (window.parent.navigateToCustomPage) {
+                                window.parent.navigateToCustomPage('payment.html?' + params);
+                                return;
+                            }
+                            
+                            // 方式2：直接在父窗口中设置location
+                            window.parent.location.href = 'pages/payment.html?' + params;
+                        } catch (e) {
+                            // 如果无法访问父窗口（可能是跨域限制），则在当前iframe中导航
+                            console.log('无法在父窗口中导航，将在当前窗口打开支付页面');
+                            window.location.href = 'payment.html?' + params;
+                        }
+                    } else {
+                        // 如果不在iframe中，直接在当前窗口导航
+                        window.location.href = 'payment.html?' + params;
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html> 
