@@ -5,6 +5,7 @@
   $: currentPath = $page.url.pathname;
   
   const navItems = [
+    { href: '/', label: '首页' },
     { href: '/photo-to-image', label: '照片圆梦' },
     { href: '/emoji-master', label: '表情包大师' },
     { href: '/showcase', label: '作品展示' },

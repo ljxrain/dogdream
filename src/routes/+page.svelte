@@ -55,12 +55,16 @@
   ];
 
   const photoRecommendations = [
-    { img: 'https://images.unsplash.com/photo-1695218868733-5a88ac270daa?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', title: '吉卜力风格', likes: '2.3万' },
-    { img: 'https://images.unsplash.com/photo-1682695796954-bad0d0f59ff1?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', title: '迪士尼角色', likes: '1.8万' },
-    { img: 'https://images.unsplash.com/photo-1617503752587-97d2103a96ea?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', title: '水墨画风格', likes: '1.2万' },
-    { img: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', title: '油画风格', likes: '0.9万' },
-    { img: 'https://images.unsplash.com/photo-1582285335839-21321c2ba39e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', title: '像素艺术', likes: '0.8万' },
-    { img: 'https://images.unsplash.com/photo-1617791160536-595b11593457?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', title: '水彩画', likes: '0.7万' }
+    { img: '/recommendations/photo/photo1.png', title: '吉卜力风格', likes: '2.3万' },
+    { img: '/recommendations/photo/photo2.png', title: '迪士尼角色', likes: '1.8万' },
+    { img: '/recommendations/photo/photo3.png', title: '水墨画风格', likes: '1.2万' },
+    { img: '/recommendations/photo/photo4.png', title: '油画风格', likes: '0.9万' },
+    { img: '/recommendations/photo/photo5.png', title: '像素艺术', likes: '0.8万' },
+    { img: '/recommendations/photo/photo6.png', title: '水彩画', likes: '0.7万' },
+    { img: '/recommendations/photo/photo7.png', title: '动漫风格', likes: '1.5万' },
+    { img: '/recommendations/photo/photo8.png', title: '3D卡通', likes: '1.1万' },
+    { img: '/recommendations/photo/photo9.png', title: '皮克斯风格', likes: '0.9万' },
+    { img: '/recommendations/photo/photo10.png', title: '乐高风格', likes: '0.6万' }
   ];
 
   const videoRecommendations = [
@@ -73,21 +77,29 @@
   ];
 
   const emojiRecommendations = [
-    { img: 'https://images.unsplash.com/photo-1507484467459-0c01be16726e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', title: '人物表情包', likes: '2.1万' },
-    { img: 'https://images.unsplash.com/photo-1607990283143-e81e7a2c9349?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', title: '萌宠表情包', likes: '1.6万' },
-    { img: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', title: '动态表情包', likes: '1.4万' },
-    { img: 'https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', title: '个性文字表情', likes: '0.8万' },
-    { img: 'https://images.unsplash.com/photo-1544723795-3fb6469f5b39?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', title: '搞笑表情包', likes: '0.7万' },
-    { img: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', title: '可爱表情包', likes: '0.6万' }
+    { img: '/recommendations/emoji/emoji1.png', title: '人物表情包', likes: '2.1万' },
+    { img: '/recommendations/emoji/emoji2.png', title: '萌宠表情包', likes: '1.6万' },
+    { img: '/recommendations/emoji/emoji3.png', title: '动态表情包', likes: '1.4万' },
+    { img: '/recommendations/emoji/emoji4.png', title: '个性文字表情', likes: '0.8万' },
+    { img: '/recommendations/emoji/emoji5.png', title: '搞笑表情包', likes: '0.7万' },
+    { img: '/recommendations/emoji/emoji6.png', title: '可爱表情包', likes: '0.6万' },
+    { img: '/recommendations/emoji/emoji7.png', title: '卡通表情包', likes: '1.2万' },
+    { img: '/recommendations/emoji/emoji8.png', title: '创意表情包', likes: '0.9万' },
+    { img: '/recommendations/emoji/emoji9.png', title: '趣味表情包', likes: '0.8万' },
+    { img: '/recommendations/emoji/emoji10.png', title: '经典表情包', likes: '0.5万' }
   ];
 
   const shopRecommendations = [
-    { img: 'https://images.unsplash.com/photo-1631125915902-d8abe55ac012?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', title: '3D车载玩偶', price: '¥266' },
-    { img: 'https://images.unsplash.com/photo-1602532305019-3dbbd482dae9?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', title: '个性钥匙链', price: '¥39' },
-    { img: 'https://images.unsplash.com/photo-1591197172062-c718f82aba20?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', title: '定制抱枕', price: '¥88' },
-    { img: 'https://images.unsplash.com/photo-1584269600464-37b1b58a9fe7?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', title: '毛绒玩偶', price: '¥128' },
-    { img: 'https://images.unsplash.com/photo-1571945153237-4929e783af4a?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', title: '定制T恤', price: '¥89' },
-    { img: 'https://images.unsplash.com/photo-1586495777744-4413f21062fa?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', title: '手机壳', price: '¥45' }
+    { img: '/recommendations/shop/shop1.png', title: '3D车载玩偶', price: '¥266' },
+    { img: '/recommendations/shop/shop2.png', title: '个性钥匙链', price: '¥39' },
+    { img: '/recommendations/shop/shop3.png', title: '定制抱枕', price: '¥88' },
+    { img: '/recommendations/shop/shop4.png', title: '毛绒玩偶', price: '¥128' },
+    { img: '/recommendations/shop/shop5.png', title: '定制T恤', price: '¥89' },
+    { img: '/recommendations/shop/shop6.png', title: '手机壳', price: '¥45' },
+    { img: '/recommendations/shop/shop7.png', title: '马克杯', price: '¥35' },
+    { img: '/recommendations/shop/shop8.png', title: '帆布包', price: '¥55' },
+    { img: '/recommendations/shop/shop9.png', title: '鼠标垫', price: '¥25' },
+    { img: '/recommendations/shop/shop10.png', title: '贴纸套装', price: '¥15' }
   ];
 
   const stats = [
@@ -247,7 +259,7 @@
           <p class="text-gray-600">将你的照片转换成各种艺术风格，实现创意梦想</p>
         </div>
       </div>
-      <a href="/photo-to-image" class="text-blue-600 hover:text-blue-700 font-medium">查看更多 →</a>
+      <a href="/photo-gallery" class="text-blue-600 hover:text-blue-700 font-medium">查看更多 →</a>
     </div>
     <div class="relative overflow-hidden">
       <div class="flex overflow-x-auto recommendation-scroll gap-6 pb-4">

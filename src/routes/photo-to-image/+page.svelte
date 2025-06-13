@@ -18,14 +18,14 @@
   let fastMode = false; // 快速模式
 
   const styles = [
-    { name: '动漫风格', preview: '/images/anime-style.jpg', description: '日式动漫风格，清新明亮' },
-    { name: '吉卜力风格', preview: '/images/ghibli-style.jpg', description: '宫崎骏动画风格，梦幻氛围' },
-    { name: '油画风格', preview: '/images/oil-style.jpg', description: '经典油画风格，艺术感强' },
-    { name: '水墨画风格', preview: '/images/ink-style.jpg', description: '中国水墨画风格，意境深远' },
-    { name: '3D卡通', preview: '/images/3d-cartoon-style.jpg', description: '现代3D卡通风格，立体感强' },
-    { name: '皮克斯风格', preview: '/images/pixar-style.jpg', description: '皮克斯3D动画风格，温暖色调' },
-    { name: '迪士尼风格', preview: '/images/disney-style.jpg', description: '迪士尼动画风格，温馨可爱' },
-    { name: '乐高风格', preview: '/images/lego-style.jpg', description: '积木玩具风格，色彩鲜艳' }
+    { name: '动漫风格', preview: '/styles/style1.png', description: '日式动漫风格，清新明亮' },
+    { name: '吉卜力风格', preview: '/styles/style2.png', description: '宫崎骏动画风格，梦幻氛围' },
+    { name: '油画风格', preview: '/styles/style3.png', description: '经典油画风格，艺术感强' },
+    { name: '水墨画风格', preview: '/styles/style4.png', description: '中国水墨画风格，意境深远' },
+    { name: '3D卡通', preview: '/styles/style5.png', description: '现代3D卡通风格，立体感强' },
+    { name: '皮克斯风格', preview: '/styles/style6.png', description: '皮克斯3D动画风格，温暖色调' },
+    { name: '迪士尼风格', preview: '/styles/style7.png', description: '迪士尼动画风格，温馨可爱' },
+    { name: '乐高风格', preview: '/styles/style8.png', description: '积木玩具风格，色彩鲜艳' }
   ];
 
   const qualities = ['普通', '高清', '超清'] as const;
@@ -313,8 +313,17 @@
                   class="style-card p-3 border-2 rounded-lg text-center transition-all {selectedStyle === style.name ? 'selected' : 'border-gray-200 hover:border-purple-300'}"
                   on:click={() => selectStyle(style.name)}
                 >
-                  <div class="aspect-square bg-gray-200 rounded-md mb-2 flex items-center justify-center">
-                    <span class="text-lg">🎨</span>
+                  <div class="aspect-square bg-gray-200 rounded-md mb-2 overflow-hidden">
+                    <img 
+                      src={style.preview} 
+                      alt={style.name}
+                      class="w-full h-full object-cover"
+                      on:error={(e) => {
+                        const target = e.currentTarget;
+                        target.style.display = 'none';
+                        target.parentElement.innerHTML = '<span class="text-lg flex items-center justify-center h-full">🎨</span>';
+                      }}
+                    />
                   </div>
                   <div class="font-semibold text-sm text-gray-800">{style.name}</div>
                   <div class="text-xs text-gray-600">{style.description}</div>

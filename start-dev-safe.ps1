@@ -1,62 +1,62 @@
-# 安全启动开发服务器脚本
-Write-Host "🚀 启动造梦家开发环境..." -ForegroundColor Cyan
+# Safe Development Server Startup Script
+Write-Host "Starting Dream Home Development Environment..." -ForegroundColor Cyan
 
-# 1. 检查并清理现有的Node.js进程
-Write-Host "`n🔍 检查现有的Node.js进程..." -ForegroundColor Yellow
+# 1. Check and clean existing Node.js processes
+Write-Host "`nChecking existing Node.js processes..." -ForegroundColor Yellow
 $nodeProcesses = Get-Process node -ErrorAction SilentlyContinue
 if ($nodeProcesses) {
-    Write-Host "发现 $($nodeProcesses.Count) 个Node.js进程正在运行" -ForegroundColor Red
-    Write-Host "正在清理重复进程..." -ForegroundColor Yellow
+    Write-Host "Found $($nodeProcesses.Count) Node.js processes running" -ForegroundColor Red
+    Write-Host "Cleaning duplicate processes..." -ForegroundColor Yellow
     taskkill /f /im node.exe
     Start-Sleep -Seconds 2
-    Write-Host "✅ 进程清理完成" -ForegroundColor Green
+    Write-Host "Process cleanup completed" -ForegroundColor Green
 } else {
-    Write-Host "✅ 没有发现现有的Node.js进程" -ForegroundColor Green
+    Write-Host "No existing Node.js processes found" -ForegroundColor Green
 }
 
-# 2. 检查PostgreSQL状态
-Write-Host "`n🗄️ 检查PostgreSQL服务状态..." -ForegroundColor Yellow
+# 2. Check PostgreSQL status
+Write-Host "`nChecking PostgreSQL service status..." -ForegroundColor Yellow
 $pgService = Get-Service postgresql-x64-17 -ErrorAction SilentlyContinue
 if ($pgService -and $pgService.Status -eq "Running") {
-    Write-Host "✅ PostgreSQL 17 正在运行" -ForegroundColor Green
+    Write-Host "PostgreSQL 17 is running" -ForegroundColor Green
 } else {
-    Write-Host "⚠️ PostgreSQL 17 未运行，正在启动..." -ForegroundColor Yellow
+    Write-Host "PostgreSQL 17 not running, starting..." -ForegroundColor Yellow
     try {
         Start-Service postgresql-x64-17
-        Write-Host "✅ PostgreSQL 17 启动成功" -ForegroundColor Green
+        Write-Host "PostgreSQL 17 started successfully" -ForegroundColor Green
     } catch {
-        Write-Host "❌ PostgreSQL 17 启动失败: $($_.Exception.Message)" -ForegroundColor Red
-        Write-Host "请手动启动PostgreSQL服务" -ForegroundColor Yellow
+        Write-Host "PostgreSQL 17 startup failed: $($_.Exception.Message)" -ForegroundColor Red
+        Write-Host "Please start PostgreSQL service manually" -ForegroundColor Yellow
     }
 }
 
-# 3. 设置环境变量
-Write-Host "`n🔑 设置环境变量..." -ForegroundColor Yellow
+# 3. Set environment variables
+Write-Host "`nSetting environment variables..." -ForegroundColor Yellow
 $env:JWT_SECRET = "dream-home-super-secret-jwt-key-2024"
 $env:DATABASE_URL = "postgresql://postgres:postgres@localhost:5432/dreamhome"
 $env:NODE_ENV = "development"
-Write-Host "✅ 环境变量设置完成" -ForegroundColor Green
+Write-Host "Environment variables set successfully" -ForegroundColor Green
 
-# 4. 检查端口占用
-Write-Host "`n🔌 检查端口5173占用情况..." -ForegroundColor Yellow
+# 4. Check port usage
+Write-Host "`nChecking port 5173 usage..." -ForegroundColor Yellow
 $portCheck = netstat -an | Select-String ":5173"
 if ($portCheck) {
-    Write-Host "⚠️ 端口5173被占用: $portCheck" -ForegroundColor Yellow
+    Write-Host "Port 5173 is in use: $portCheck" -ForegroundColor Yellow
 } else {
-    Write-Host "✅ 端口5173可用" -ForegroundColor Green
+    Write-Host "Port 5173 is available" -ForegroundColor Green
 }
 
-# 5. 启动开发服务器
-Write-Host "`n🎯 启动开发服务器..." -ForegroundColor Cyan
-Write-Host "服务器将启动在: http://localhost:5173" -ForegroundColor Green
-Write-Host "按 Ctrl+C 停止服务器" -ForegroundColor Yellow
+# 5. Start development server
+Write-Host "`nStarting development server..." -ForegroundColor Cyan
+Write-Host "Server will be available at: http://localhost:5173" -ForegroundColor Green
+Write-Host "Press Ctrl+C to stop server" -ForegroundColor Yellow
 Write-Host "----------------------------------------" -ForegroundColor Cyan
 
 try {
     npm run dev
 } catch {
-    Write-Host "`n❌ 开发服务器启动失败: $($_.Exception.Message)" -ForegroundColor Red
-    Write-Host "请检查npm和依赖是否正确安装" -ForegroundColor Yellow
+    Write-Host "`nDevelopment server startup failed: $($_.Exception.Message)" -ForegroundColor Red
+    Write-Host "Please check if npm and dependencies are properly installed" -ForegroundColor Yellow
 }
 
-Write-Host "`n🛑 开发服务器已停止" -ForegroundColor Red 
+Write-Host "`nDevelopment server stopped" -ForegroundColor Red

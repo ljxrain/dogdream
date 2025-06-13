@@ -15,14 +15,14 @@
   ];
   
   const products = [
-    { id: 1, name: '定制T恤', price: 49, desc: '采用优质纯棉面料，舒适透气，专属个性定制图案，夏季穿着清爽舒适。', category: 'clothing', img: 'https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?q=80&w=400', rating: 4.5, hot: true },
-    { id: 2, name: '个性手机壳', price: 29, desc: '适用多种型号，3D立体打印，防摔防刮，完美贴合手机，保护手机的同时彰显个性。', category: 'accessory', img: 'https://images.unsplash.com/photo-1606220588913-b3aacb4d2f46?q=80&w=400', rating: 4.8, new: true },
-    { id: 3, name: '毛绒玩偶', price: 128, desc: '柔软舒适，安全无毒，完美还原设计，陪伴孩子成长，也是成年人的治愈神器。', category: 'home', img: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?q=80&w=400', rating: 4.9 },
-    { id: 4, name: '3D车载玩偶', price: 266, desc: '精工制作，立体逼真，专为车内设计，让每次出行都充满乐趣和个性。', category: 'accessory', img: 'https://images.unsplash.com/photo-1631125915902-d8abe55ac012?q=80&w=400', rating: 4.7 },
-    { id: 5, name: '定制抱枕', price: 88, desc: '高品质面料，填充饱满，印刷清晰，为家居增添温馨个性化元素。', category: 'home', img: 'https://images.unsplash.com/photo-1591197172062-c718f82aba20?q=80&w=400', rating: 4.6 },
-    { id: 6, name: '个性钥匙链', price: 39, desc: '小巧精致，携带便利，金属材质，持久耐用，展现独特品味。', category: 'accessory', img: 'https://images.unsplash.com/photo-1602532305019-3dbbd482dae9?q=80&w=400', rating: 4.4 },
-    { id: 7, name: '马克杯', price: 58, desc: '陶瓷材质，保温性好，图案清晰持久，每天喝水都是享受。', category: 'home', img: 'https://images.unsplash.com/photo-1570197788417-0e82375c9371?q=80&w=400', rating: 4.5 },
-    { id: 8, name: '笔记本', price: 35, desc: '优质纸张，封面个性定制，记录生活点滴，让思绪更有温度。', category: 'stationery', img: 'https://images.unsplash.com/photo-1531346878377-a5be20888e57?q=80&w=400', rating: 4.3 }
+    { id: 1, name: '定制T恤', price: 49, desc: '采用优质纯棉面料，舒适透气，专属个性定制图案，夏季穿着清爽舒适。', category: 'clothing', img: '/recommendations/shop/shop1.png', rating: 4.5, hot: true },
+    { id: 2, name: '个性手机壳', price: 29, desc: '适用多种型号，3D立体打印，防摔防刮，完美贴合手机，保护手机的同时彰显个性。', category: 'accessory', img: '/recommendations/shop/shop2.png', rating: 4.8, new: true },
+    { id: 3, name: '毛绒玩偶', price: 128, desc: '柔软舒适，安全无毒，完美还原设计，陪伴孩子成长，也是成年人的治愈神器。', category: 'home', img: '/recommendations/shop/shop3.png', rating: 4.9 },
+    { id: 4, name: '3D车载玩偶', price: 266, desc: '精工制作，立体逼真，专为车内设计，让每次出行都充满乐趣和个性。', category: 'accessory', img: '/recommendations/shop/shop4.png', rating: 4.7 },
+    { id: 5, name: '定制抱枕', price: 88, desc: '高品质面料，填充饱满，印刷清晰，为家居增添温馨个性化元素。', category: 'home', img: '/recommendations/shop/shop5.png', rating: 4.6 },
+    { id: 6, name: '个性钥匙链', price: 39, desc: '小巧精致，携带便利，金属材质，持久耐用，展现独特品味。', category: 'accessory', img: '/recommendations/shop/shop6.png', rating: 4.4 },
+    { id: 7, name: '马克杯', price: 58, desc: '陶瓷材质，保温性好，图案清晰持久，每天喝水都是享受。', category: 'home', img: '/recommendations/shop/shop7.png', rating: 4.5 },
+    { id: 8, name: '笔记本', price: 35, desc: '优质纸张，封面个性定制，记录生活点滴，让思绪更有温度。', category: 'stationery', img: '/recommendations/shop/shop8.png', rating: 4.3 }
   ];
   
   function handleFileSelect(event: Event) {
