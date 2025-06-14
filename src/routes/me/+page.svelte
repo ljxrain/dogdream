@@ -63,9 +63,6 @@
       <div class="flex flex-col md:flex-row items-center gap-8">
         <div class="relative">
           <img src={user.avatar} alt="用户头像" class="w-24 h-24 rounded-full border-4 border-white shadow-lg" />
-          <button class="absolute -bottom-2 -right-2 bg-white text-gray-600 rounded-full w-8 h-8 flex items-center justify-center shadow-lg hover:shadow-xl transition-shadow">
-            <i class="fas fa-camera text-sm"></i>
-          </button>
         </div>
         
         <div class="text-center md:text-left flex-1">
@@ -152,7 +149,7 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <a href="/photo-to-image" class="bg-white rounded-xl p-6 text-center shadow-lg hover:shadow-xl transition-shadow">
           <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-3">
-            <i class="fas fa-camera text-blue-600 text-xl"></i>
+            <i class="fas fa-image text-blue-600 text-xl"></i>
           </div>
           <h3 class="font-semibold text-gray-900 mb-1">照片圆梦</h3>
           <p class="text-gray-600 text-sm">将照片转换成艺术风格</p>

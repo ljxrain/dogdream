@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Camera, FolderOpen } from 'lucide-svelte';
+  import { FolderOpen } from 'lucide-svelte';
   
   let imageUrl: string | null = null;
 
@@ -29,20 +29,17 @@
     <div class="relative h-36 w-full">
       <img src={imageUrl} class="h-full w-full object-cover" alt="已选择的照片" />
       <button on:click={handleChangePhoto} class="absolute bottom-2 right-2 flex h-8 w-8 items-center justify-center rounded-full bg-black/50 text-white">
-        <Camera class="h-4 w-4" />
+        <i class="fas fa-edit"></i>
       </button>
     </div>
   {:else}
     <!-- Select Area -->
     <div class="flex h-36 flex-col items-center justify-center bg-white">
-      <Camera class="mb-2 h-8 w-8 text-gray-400" />
-      <p class="mb-3 text-sm text-gray-500">请选择照片来源</p>
+      <i class="fas fa-image text-4xl text-gray-400 mb-2"></i>
+      <p class="mb-3 text-sm text-gray-500">请选择图片</p>
       <div class="flex space-x-3">
-        <button class="flex items-center rounded-lg bg-indigo-600 px-4 py-2 text-xs text-white">
-          <Camera class="mr-1 h-3 w-3" /> 拍照
-        </button>
-        <label for="photoUpload" class="flex cursor-pointer items-center rounded-lg bg-gray-200 px-4 py-2 text-xs text-gray-700">
-          <FolderOpen class="mr-1 h-3 w-3" /> 相册
+        <label for="photoUpload" class="flex cursor-pointer items-center rounded-lg bg-indigo-600 px-4 py-2 text-xs text-white">
+          <FolderOpen class="mr-1 h-3 w-3" /> 选择图片
           <input type="file" accept="image/*" class="hidden" id="photoUpload" on:change={handleFileSelect} />
         </label>
       </div>

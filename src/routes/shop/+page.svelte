@@ -129,10 +129,6 @@
                 上传图片
                 <input type="file" accept="image/*" on:change={handleFileSelect} class="hidden" />
               </label>
-              <button class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-8 py-3 rounded-lg transition-colors">
-                <i class="fas fa-camera mr-2"></i>
-                拍照
-              </button>
             </div>
           </div>
         {/if}

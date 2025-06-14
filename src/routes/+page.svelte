@@ -31,7 +31,7 @@
     {
       href: '/photo-to-image',
       img: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80',
-      icon: 'fas fa-camera',
+      icon: 'fas fa-image',
       title: '照片圆梦',
       description: '将你的照片转换成各种艺术风格，实现创意梦想',
       color: 'blue'

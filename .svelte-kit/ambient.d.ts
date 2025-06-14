@@ -26,6 +26,9 @@
  * ```
  */
 declare module '$env/static/private' {
+	export const JWT_SECRET: string;
+	export const DATABASE_URL: string;
+	export const NODE_ENV: string;
 	export const ALLUSERSPROFILE: string;
 	export const APPDATA: string;
 	export const BUNDLED_DEBUGPY_PATH: string;
@@ -39,23 +42,18 @@ declare module '$env/static/private' {
 	export const COMPUTERNAME: string;
 	export const ComSpec: string;
 	export const CURSOR_TRACE_ID: string;
-	export const DATABASE_URL: string;
 	export const DriverData: string;
 	export const EDITOR: string;
-	export const EFC_7720: string;
-	export const FPS_BROWSER_APP_PROFILE_STRING: string;
-	export const FPS_BROWSER_USER_PROFILE_STRING: string;
+	export const EFC_7576: string;
 	export const GIT_ASKPASS: string;
 	export const HOME: string;
 	export const HOMEDRIVE: string;
 	export const HOMEPATH: string;
 	export const INIT_CWD: string;
-	export const JWT_SECRET: string;
 	export const LANG: string;
 	export const LOCALAPPDATA: string;
 	export const LOGONSERVER: string;
 	export const NODE: string;
-	export const NODE_ENV: string;
 	export const npm_command: string;
 	export const npm_config_cache: string;
 	export const npm_config_globalconfig: string;
@@ -89,6 +87,7 @@ declare module '$env/static/private' {
 	export const ProgramFiles: string;
 	export const ProgramW6432: string;
 	export const PROMPT: string;
+	export const PSExecutionPolicyPreference: string;
 	export const PSModulePath: string;
 	export const PUBLIC: string;
 	export const PYDEVD_DISABLE_FILE_VALIDATION: string;
@@ -103,6 +102,7 @@ declare module '$env/static/private' {
 	export const USERDOMAIN_ROAMINGPROFILE: string;
 	export const USERNAME: string;
 	export const USERPROFILE: string;
+	export const VITE_USER_NODE_ENV: string;
 	export const VSCODE_DEBUGPY_ADAPTER_ENDPOINTS: string;
 	export const VSCODE_GIT_ASKPASS_EXTRA_ARGS: string;
 	export const VSCODE_GIT_ASKPASS_MAIN: string;
@@ -122,7 +122,7 @@ declare module '$env/static/private' {
  * ```
  */
 declare module '$env/static/public' {
-	
+	export const PUBLIC_APP_URL: string;
 }
 
 /**
@@ -139,6 +139,9 @@ declare module '$env/static/public' {
  */
 declare module '$env/dynamic/private' {
 	export const env: {
+		JWT_SECRET: string;
+		DATABASE_URL: string;
+		NODE_ENV: string;
 		ALLUSERSPROFILE: string;
 		APPDATA: string;
 		BUNDLED_DEBUGPY_PATH: string;
@@ -152,23 +155,18 @@ declare module '$env/dynamic/private' {
 		COMPUTERNAME: string;
 		ComSpec: string;
 		CURSOR_TRACE_ID: string;
-		DATABASE_URL: string;
 		DriverData: string;
 		EDITOR: string;
-		EFC_7720: string;
-		FPS_BROWSER_APP_PROFILE_STRING: string;
-		FPS_BROWSER_USER_PROFILE_STRING: string;
+		EFC_7576: string;
 		GIT_ASKPASS: string;
 		HOME: string;
 		HOMEDRIVE: string;
 		HOMEPATH: string;
 		INIT_CWD: string;
-		JWT_SECRET: string;
 		LANG: string;
 		LOCALAPPDATA: string;
 		LOGONSERVER: string;
 		NODE: string;
-		NODE_ENV: string;
 		npm_command: string;
 		npm_config_cache: string;
 		npm_config_globalconfig: string;
@@ -202,6 +200,7 @@ declare module '$env/dynamic/private' {
 		ProgramFiles: string;
 		ProgramW6432: string;
 		PROMPT: string;
+		PSExecutionPolicyPreference: string;
 		PSModulePath: string;
 		PUBLIC: string;
 		PYDEVD_DISABLE_FILE_VALIDATION: string;
@@ -216,6 +215,7 @@ declare module '$env/dynamic/private' {
 		USERDOMAIN_ROAMINGPROFILE: string;
 		USERNAME: string;
 		USERPROFILE: string;
+		VITE_USER_NODE_ENV: string;
 		VSCODE_DEBUGPY_ADAPTER_ENDPOINTS: string;
 		VSCODE_GIT_ASKPASS_EXTRA_ARGS: string;
 		VSCODE_GIT_ASKPASS_MAIN: string;
@@ -240,6 +240,7 @@ declare module '$env/dynamic/private' {
  */
 declare module '$env/dynamic/public' {
 	export const env: {
+		PUBLIC_APP_URL: string;
 		[key: `PUBLIC_${string}`]: string | undefined;
 	}
 }
