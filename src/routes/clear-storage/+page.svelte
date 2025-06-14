@@ -20,7 +20,7 @@
 </script>
 
 <svelte:head>
-  <title>清除缓存 - 造梦家</title>
+  	<title>清除缓存 - 狗狗造梦家</title>
 </svelte:head>
 
 <div class="min-h-screen bg-gray-50 flex items-center justify-center">

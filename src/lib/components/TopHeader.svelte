@@ -49,7 +49,7 @@
       <div class="flex items-center">
         <a href="/" class="flex items-center space-x-2">
           <i class="fas fa-magic text-2xl text-blue-600"></i>
-          <h1 class="text-2xl font-bold text-gray-900">造梦家</h1>
+          			<h1 class="text-2xl font-bold text-gray-900">狗狗造梦家</h1>
         </a>
       </div>
       

@@ -9,7 +9,7 @@
 </script>
 
 <svelte:head>
-  <title>个人中心 - 造梦家</title>
+  	<title>个人中心 - 狗狗造梦家</title>
 </svelte:head>
 
 <!-- 加载中提示 -->

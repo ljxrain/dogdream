@@ -206,7 +206,7 @@
 </script>
 
 <svelte:head>
-  <title>产品经理后台 - 造梦家</title>
+  	<title>产品经理后台 - 狗狗造梦家</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </svelte:head>
 

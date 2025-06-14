@@ -50,6 +50,18 @@
 	"/api/image-generation": [
 		"src/routes/api/image-generation/+server.ts"
 	],
+	"/api/images/[filename]": [
+		"src/routes/api/images/[filename]/+server.ts"
+	],
+	"/api/orders": [
+		"src/routes/api/orders/+server.ts"
+	],
+	"/api/pet-pod-preview": [
+		"src/routes/api/pet-pod-preview/+server.ts"
+	],
+	"/api/placeholder/[...path]": [
+		"src/routes/api/placeholder/[...path]/+server.ts"
+	],
 	"/api/volcano-cv": [
 		"src/routes/api/volcano-cv/+server.ts"
 	],
@@ -67,5 +79,6 @@
 	"/shop": [],
 	"/showcase": [],
 	"/test-douban-api": [],
+	"/test-images": [],
 	"/test-volcano-cv": []
 }

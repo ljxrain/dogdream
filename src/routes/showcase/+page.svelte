@@ -89,7 +89,7 @@
 </script>
 
 <svelte:head>
-  <title>热门作品 - 造梦家</title>
+  	<title>热门作品 - 狗狗造梦家</title>
   <meta name="description" content="发现精彩创作，寻找创意灵感" />
 </svelte:head>
 

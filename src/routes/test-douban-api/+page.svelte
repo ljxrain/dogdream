@@ -132,7 +132,7 @@
 </script>
 
 <svelte:head>
-  <title>火山引擎API测试 - 造梦家</title>
+  	<title>火山引擎API测试 - 狗狗造梦家</title>
   <meta name="description" content="火山引擎AIGC图像风格化API测试页面" />
 </svelte:head>
 

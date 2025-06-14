@@ -71,7 +71,7 @@
 </script>
 
 <svelte:head>
-  <title>数据库管理 - 造梦家</title>
+  	<title>数据库管理 - 狗狗造梦家</title>
 </svelte:head>
 
 <div class="min-h-screen bg-gray-50">

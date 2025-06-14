@@ -16,7 +16,7 @@
   ];
   
   const milestones = [
-    { year: '2023年1月', title: '公司成立', desc: '造梦家正式成立，开始AI创作平台的研发' },
+    		{ year: '2023年1月', title: '公司成立', desc: '狗狗造梦家正式成立，开始AI创作平台的研发' },
     { year: '2023年3月', title: '产品上线', desc: '首版产品发布，支持基础的照片风格转换功能' },
     { year: '2023年6月', title: '用户突破', desc: '注册用户突破10万，获得种子轮融资' },
     { year: '2023年9月', title: '功能升级', desc: '新增视频生成和表情包制作功能' },
@@ -33,8 +33,8 @@
 </script>
 
 <svelte:head>
-  <title>关于我们 - 造梦家</title>
-  <meta name="description" content="了解造梦家的使命、愿景和团队" />
+  	<title>关于我们 - 狗狗造梦家</title>
+	<meta name="description" content="了解狗狗造梦家的使命、愿景和团队" />
 </svelte:head>
 
 <style>
@@ -76,7 +76,7 @@
   <!-- Hero Section -->
   <section class="hero-section text-white py-20">
     <div class="max-w-4xl mx-auto px-6 text-center">
-      <h1 class="text-5xl md:text-6xl font-bold mb-8">关于造梦家</h1>
+      			<h1 class="text-5xl md:text-6xl font-bold mb-8">关于狗狗造梦家</h1>
       <p class="text-xl md:text-2xl mb-12 opacity-90">用AI技术点亮每个人的创作梦想</p>
       <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
         {#each stats as stat}
@@ -126,7 +126,7 @@
     <section class="mb-20">
       <div class="text-center mb-16">
         <h2 class="text-4xl font-bold text-gray-900 mb-6">核心特色</h2>
-        <p class="text-xl text-gray-600">为什么选择造梦家</p>
+        			<p class="text-xl text-gray-600">为什么选择狗狗造梦家</p>
       </div>
       
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

@@ -122,7 +122,7 @@
 </script>
 
 <svelte:head>
-  <title>{getRoleDisplayName(user?.role || '')}仪表板 - 造梦家</title>
+  	<title>{getRoleDisplayName(user?.role || '')}仪表板 - 狗狗造梦家</title>
 </svelte:head>
 
 <div class="min-h-screen bg-gray-50">
@@ -131,7 +131,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between h-16">
         <div class="flex items-center">
-          <h1 class="text-xl font-bold text-gray-900">🏠 造梦家管理后台</h1>
+          			<h1 class="text-xl font-bold text-gray-900">🏠 狗狗造梦家管理后台</h1>
           <span class="ml-4 px-3 py-1 rounded-full text-xs font-medium {getRoleColor(user?.role || '')}">
             {getRoleDisplayName(user?.role || '')}
           </span>

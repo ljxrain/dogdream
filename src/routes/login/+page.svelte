@@ -145,8 +145,8 @@
 </script>
 
 <svelte:head>
-  <title>登录 - 造梦家</title>
-  <meta name="description" content="登录造梦家，开始你的创作之旅" />
+  	<title>登录 - 狗狗造梦家</title>
+	<meta name="description" content="登录狗狗造梦家，开始你的创作之旅" />
 </svelte:head>
 
 <div class="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -157,7 +157,7 @@
         <i class="fas fa-magic text-3xl text-white"></i>
       </div>
       <h2 class="text-3xl font-bold text-gray-900 mb-2">欢迎回来</h2>
-      <p class="text-lg text-gray-600">登录你的造梦家账户</p>
+      			<p class="text-lg text-gray-600">登录你的狗狗造梦家账户</p>
     </div>
     
     <!-- 登录表单卡片 -->

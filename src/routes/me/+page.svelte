@@ -20,7 +20,7 @@
     { icon: 'fas fa-map-marker-alt', title: '地址管理', desc: '收货地址', href: '/address-management' },
     { icon: 'fas fa-cog', title: '设置', desc: '账户设置', href: '/settings' },
     { icon: 'fas fa-question-circle', title: '帮助反馈', desc: '获取帮助', href: '/help-feedback' },
-    { icon: 'fas fa-info-circle', title: '关于我们', desc: '了解造梦家', href: '/about' }
+    		{ icon: 'fas fa-info-circle', title: '关于我们', desc: '了解狗狗造梦家', href: '/about' }
   ];
   
   const stats = [
@@ -32,7 +32,7 @@
 </script>
 
 <svelte:head>
-  <title>个人中心 - 造梦家</title>
+  	<title>个人中心 - 狗狗造梦家</title>
   <meta name="description" content="管理你的账户信息、作品和订单" />
 </svelte:head>
 

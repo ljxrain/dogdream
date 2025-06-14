@@ -60,7 +60,7 @@
 </script>
 
 <svelte:head>
-  <title>照片圆梦作品展示 - 造梦家</title>
+  	<title>照片圆梦作品展示 - 狗狗造梦家</title>
   <meta name="description" content="将你的照片转换成各种艺术风格，实现创意梦想" />
 </svelte:head>
 

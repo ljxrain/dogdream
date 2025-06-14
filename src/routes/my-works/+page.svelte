@@ -128,7 +128,7 @@
 </script>
 
 <svelte:head>
-  <title>我的作品 - 造梦家</title>
+  	<title>我的作品 - 狗狗造梦家</title>
   <meta name="description" content="管理你的创作作品，查看作品数据" />
 </svelte:head>
 

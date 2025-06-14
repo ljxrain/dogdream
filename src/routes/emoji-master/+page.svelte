@@ -95,7 +95,7 @@
 </script>
 
 <svelte:head>
-  <title>表情包大师 - 造梦家</title>
+  	<title>表情包大师 - 狗狗造梦家</title>
   <meta name="description" content="个性化表情包，让聊天更有趣" />
 </svelte:head>
 

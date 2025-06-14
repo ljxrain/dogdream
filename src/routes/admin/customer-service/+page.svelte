@@ -159,7 +159,7 @@
 </script>
 
 <svelte:head>
-  <title>客服后台 - 造梦家</title>
+  	<title>客服后台 - 狗狗造梦家</title>
 </svelte:head>
 
 <div class="min-h-screen bg-gray-50">

@@ -6,6 +6,10 @@ export default defineConfig({
 	server: {
 		fs: {
 			strict: false
+		},
+		watch: {
+			// 忽略.env文件变化，防止频繁重启
+			ignored: ['**/.env', '**/.env.*', '**/env-*.txt', '**/*.ps1']
 		}
 	}
 }); 

@@ -140,7 +140,7 @@
       if (response.ok) {
         // 注册成功，保存token
         localStorage.setItem('token', result.token);
-        alert('注册成功！欢迎加入造梦家');
+        				alert('注册成功！欢迎加入狗狗造梦家');
         goto('/');
       } else {
         alert(result.message || '注册失败');
@@ -196,8 +196,8 @@
 </script>
 
 <svelte:head>
-  <title>注册 - 造梦家</title>
-  <meta name="description" content="注册造梦家账户，开启你的创作之旅" />
+  	<title>注册 - 狗狗造梦家</title>
+	<meta name="description" content="注册狗狗造梦家账户，开启你的创作之旅" />
 </svelte:head>
 
 <div class="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -207,7 +207,7 @@
       <div class="w-24 h-24 mx-auto mb-6 bg-gradient-to-r from-purple-500 to-pink-600 rounded-3xl flex items-center justify-center shadow-lg">
         <i class="fas fa-magic text-3xl text-white"></i>
       </div>
-      <h2 class="text-3xl font-bold text-gray-900 mb-2">加入造梦家</h2>
+      			<h2 class="text-3xl font-bold text-gray-900 mb-2">加入狗狗造梦家</h2>
       <p class="text-lg text-gray-600">创建你的专属账户</p>
     </div>
     
