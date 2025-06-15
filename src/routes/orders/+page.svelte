@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { isLoggedIn, user } from '$lib/stores/auth';
   
   let activeTab = 'all';
   let selectedOrder: any = null;
@@ -74,15 +75,17 @@
       isLoading = true;
       error = null;
       
-      const token = localStorage.getItem('token');
-      if (!token) {
+      // 检查登录状态
+      if (!$isLoggedIn) {
         error = '请先登录';
         return;
       }
 
       const response = await fetch('/api/orders', {
+        method: 'GET',
+        credentials: 'include',
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Content-Type': 'application/json'
         }
       });
 

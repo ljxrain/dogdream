@@ -52,8 +52,10 @@
   }
   
   function handleImageError(event: Event) {
-    const target = event.target as HTMLImageElement;
-    if (target) {
+    const target = event.target;
+    // @ts-ignore
+    if (target && target.src) {
+      // @ts-ignore
       target.src = '/recommendations/photo/photo1.png';
     }
   }

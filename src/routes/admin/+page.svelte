@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
+  import { isLoggedIn, user as authUser } from '$lib/stores/auth';
   
   let user: any = null;
   let stats = {
@@ -24,32 +25,19 @@
   
   onMount(async () => {
     // 检查用户登录状态和权限
-    const token = localStorage.getItem('token');
-    if (!token) {
+    if (!$isLoggedIn || !$authUser) {
       goto('/login');
       return;
     }
     
     try {
-      // 获取当前用户信息
-      const userResponse = await fetch('/api/auth/me', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+      user = $authUser;
       
-      if (userResponse.ok) {
-        user = await userResponse.json();
-        
-        // 检查是否有管理权限
-        const allowedRoles = ['ADMIN', 'PRODUCT_MANAGER', 'CUSTOMER_SERVICE'];
-        if (!allowedRoles.includes(user.role)) {
-          alert('您没有访问此页面的权限');
-          goto('/');
-          return;
-        }
-      } else {
-        goto('/login');
+      // 检查是否有管理权限
+      const allowedRoles = ['ADMIN', 'PRODUCT_MANAGER', 'CUSTOMER_SERVICE'];
+      if (!allowedRoles.includes(user.role)) {
+        alert('您没有访问此页面的权限');
+        goto('/');
         return;
       }
       
@@ -66,8 +54,10 @@
   async function loadStats() {
     try {
       const response = await fetch('/api/admin/stats', {
+        method: 'GET',
+        credentials: 'include',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Content-Type': 'application/json'
         }
       });
       
@@ -83,13 +73,19 @@
     try {
       const [usersRes, creationsRes, ordersRes] = await Promise.all([
         fetch('/api/admin/recent-users', {
-          headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+          method: 'GET',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' }
         }),
         fetch('/api/admin/recent-creations', {
-          headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+          method: 'GET',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' }
         }),
         fetch('/api/admin/recent-orders', {
-          headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+          method: 'GET',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' }
         })
       ]);
       

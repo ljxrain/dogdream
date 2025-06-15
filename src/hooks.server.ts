@@ -27,14 +27,27 @@ export const handle: Handle = async ({ event, resolve }) => {
   // 验证token并获取用户信息
   if (token) {
     try {
-      const user = await verifyToken(token);
-      if (user) {
-        event.locals.user = user;
+      const tokenPayload = await verifyToken(token);
+      if (tokenPayload) {
+        // 直接使用JWT中的用户信息（已经包含了所有必要的字段）
+        event.locals.user = {
+          id: tokenPayload.id,
+          email: tokenPayload.email,
+          name: tokenPayload.name,
+          role: tokenPayload.role
+        };
+        console.log('🔐 服务端验证token成功:', tokenPayload.email, '角色:', tokenPayload.role);
+      } else {
+        console.log('❌ 服务端token验证失败: token无效');
+        event.cookies.delete('auth-token', { path: '/' });
       }
     } catch (error) {
       // Token无效，清除cookie
+      console.log('❌ 服务端token验证异常:', error);
       event.cookies.delete('auth-token', { path: '/' });
     }
+  } else {
+    console.log('🍪 服务端未找到auth-token cookie');
   }
 
   const { pathname } = event.url;

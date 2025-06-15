@@ -24,7 +24,11 @@ export const nodes = [
 	() => import('./nodes/20'),
 	() => import('./nodes/21'),
 	() => import('./nodes/22'),
-	() => import('./nodes/23')
+	() => import('./nodes/23'),
+	() => import('./nodes/24'),
+	() => import('./nodes/25'),
+	() => import('./nodes/26'),
+	() => import('./nodes/27')
 ];
 
 export const server_loads = [];
@@ -35,23 +39,27 @@ export const dictionary = {
 		"/admin": [4],
 		"/admin/customer-service": [5],
 		"/admin/database": [6],
-		"/admin/product-manager": [7],
-		"/clear-storage": [8],
-		"/dashboard": [9],
-		"/emoji-master": [10],
-		"/help-feedback": [11],
-		"/login": [12],
-		"/me": [13],
-		"/my-works": [14],
-		"/orders": [15],
-		"/photo-gallery": [16],
-		"/photo-to-image": [17],
-		"/register": [18],
-		"/shop": [19],
-		"/showcase": [20],
-		"/test-douban-api": [21],
-		"/test-images": [22],
-		"/test-volcano-cv": [23]
+		"/admin/emoji-stats": [7],
+		"/admin/product-manager": [8],
+		"/auth-debug": [9],
+		"/auth-test": [10],
+		"/clear-storage": [11],
+		"/dashboard": [12],
+		"/emoji-gallery": [13],
+		"/emoji-master": [14],
+		"/help-feedback": [15],
+		"/login": [16],
+		"/me": [17],
+		"/my-works": [18],
+		"/orders": [19],
+		"/photo-gallery": [20],
+		"/photo-to-image": [21],
+		"/register": [22],
+		"/shop": [23],
+		"/showcase": [24],
+		"/test-douban-api": [25],
+		"/test-images": [26],
+		"/test-volcano-cv": [27]
 	};
 
 export const hooks = {

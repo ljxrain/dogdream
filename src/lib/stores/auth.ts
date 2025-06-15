@@ -16,67 +16,130 @@ export interface User {
 // 用户状态store
 export const user = writable<User | null>(null);
 
-// 登录状态store
-export const isLoggedIn = writable<boolean>(false);
+// 登录状态store - 初始状态基于cookie检查
+export const isLoggedIn = writable<boolean>(browser ? !!getTokenSync() : false);
 
 // 加载状态store
 export const isLoading = writable<boolean>(false);
 
-// 获取token
+// 同步获取token从cookie（不打印日志）
+function getTokenSync() {
+  if (!browser) return null;
+  const cookies = document.cookie.split(';');
+  for (let cookie of cookies) {
+    const [name, value] = cookie.trim().split('=');
+    if (name === 'auth-token') {
+      return value;
+    }
+  }
+  return null;
+}
+
+// 获取token从cookie
 const getToken = () => {
   if (!browser) return null;
-  return localStorage.getItem('token');
+  const cookies = document.cookie.split(';');
+  for (let cookie of cookies) {
+    const [name, value] = cookie.trim().split('=');
+    if (name === 'auth-token') {
+      console.log('🍪 客户端找到token:', value ? '存在' : '空值');
+      return value;
+    }
+  }
+  console.log('🍪 客户端未找到auth-token cookie');
+  console.log('🍪 当前所有cookies:', document.cookie);
+  return null;
 };
 
-// 设置token
+// 设置token到cookie
 const setToken = (token: string) => {
   if (!browser) return;
-  localStorage.setItem('token', token);
+  const cookieString = `auth-token=${token}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax; Secure=${location.protocol === 'https:'}`;
+  document.cookie = cookieString;
+  console.log('🍪 客户端设置cookie:', cookieString);
+  console.log('🍪 设置后的cookies:', document.cookie);
 };
 
 // 移除token
 const removeToken = () => {
   if (!browser) return;
-  localStorage.removeItem('token');
+  console.log('🗑️ 清除auth-token cookie');
+  document.cookie = 'auth-token=; path=/; max-age=0; SameSite=Lax';
+  console.log('🍪 清除后的cookies:', document.cookie);
 };
+
+// 防止重复初始化的标志
+let isInitializing = false;
+let hasInitialized = false;
 
 // 初始化用户状态（仅在浏览器端执行）
 export const initializeAuth = async () => {
-  if (!browser) return;
-  
-  const token = getToken();
-  if (!token) {
-    user.set(null);
-    isLoggedIn.set(false);
+  if (!browser) {
+    console.log('🚫 非浏览器环境，跳过认证初始化');
     return;
   }
   
+  if (isInitializing) {
+    console.log('⏳ 认证初始化进行中，跳过重复调用');
+    return;
+  }
+  
+  if (hasInitialized) {
+    console.log('✅ 认证已初始化，跳过重复调用');
+    return;
+  }
+  
+  console.log('🔄 开始初始化认证状态...');
+  const token = getToken();
+  
+  if (!token) {
+    console.log('❌ 未找到token，设置为未登录状态');
+    user.set(null);
+    isLoggedIn.set(false);
+    hasInitialized = true;
+    return;
+  }
+  
+  isInitializing = true;
   isLoading.set(true);
   
   try {
+    console.log('🌐 发送认证验证请求...');
     const response = await fetch('/api/auth/me', {
+      method: 'GET',
+      credentials: 'include',
       headers: {
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
       }
     });
+    
+    console.log('📡 认证验证响应状态:', response.status);
     
     if (response.ok) {
       const userData = await response.json();
       user.set(userData);
       isLoggedIn.set(true);
+      console.log('✅ 认证状态初始化成功:', userData.email);
     } else {
       // Token无效，清除
+      console.log('❌ Token验证失败，状态码:', response.status);
+      const errorText = await response.text();
+      console.log('❌ 错误详情:', errorText);
       removeToken();
       user.set(null);
       isLoggedIn.set(false);
     }
   } catch (error) {
-    console.error('初始化认证状态失败:', error);
+    console.error('❌ 初始化认证状态失败:', error);
     removeToken();
     user.set(null);
     isLoggedIn.set(false);
   } finally {
     isLoading.set(false);
+    isInitializing = false;
+    hasInitialized = true;
+    console.log('✅ 认证初始化完成');
   }
 };
 
@@ -163,6 +226,7 @@ export const register = async (userData: {
 
 // 登出函数
 export const logout = async () => {
+  console.log('🚪 执行登出操作');
   removeToken();
   user.set(null);
   isLoggedIn.set(false);

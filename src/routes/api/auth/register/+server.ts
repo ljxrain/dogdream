@@ -2,8 +2,10 @@ import { json } from '@sveltejs/kit';
 import { prisma } from '$lib/prisma';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { JWT_SECRET } from '$env/static/private';
 import type { RequestHandler } from './$types';
+
+// 使用硬编码的JWT密钥，与start-simple.ps1中的保持一致
+const JWT_SECRET = 'dream-home-super-secret-jwt-key-2024';
 
 export const POST: RequestHandler = async ({ request }) => {
   try {

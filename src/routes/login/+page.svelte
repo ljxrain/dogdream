@@ -1,5 +1,7 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
+  import { user, isLoggedIn, isLoading as authLoading } from '$lib/stores/auth';
+  import { onMount } from 'svelte';
   
   let loginForm = {
     account: '', // 改为account，支持邮箱或手机号
@@ -13,6 +15,12 @@
   let countdownTimer: number;
   let accountType: 'email' | 'phone' | 'unknown' = 'unknown';
   let showPassword = false; // 控制密码显示隐藏
+  
+  // 检查是否已登录，如果已登录则重定向
+  $: if ($isLoggedIn && $user) {
+    console.log('👤 用户已登录，重定向到首页');
+    goto('/');
+  }
   
   // 智能检测输入类型
   function detectAccountType(value: string): 'email' | 'phone' | 'unknown' {
@@ -104,8 +112,24 @@
       const result = await response.json();
       
       if (response.ok) {
-        // 登录成功，保存token
-        localStorage.setItem('token', result.token);
+        // 登录成功，保存token到cookie
+        const cookieString = `auth-token=${result.token}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax; Secure=${location.protocol === 'https:'}`;
+        document.cookie = cookieString;
+        console.log('🍪 登录成功，设置cookie:', cookieString);
+        console.log('🍪 设置后的cookies:', document.cookie);
+        
+        // 等待一小段时间确保cookie设置完成
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        // 更新全局状态
+        user.set(result.user);
+        isLoggedIn.set(true);
+        console.log('✅ 登录成功，用户信息:', result.user);
+        
+        // 验证cookie是否设置成功
+        const verifyToken = document.cookie.split(';').find(c => c.trim().startsWith('auth-token='));
+        console.log('🔍 验证cookie设置:', verifyToken ? '成功' : '失败');
+        
         alert('登录成功！');
         goto('/');
       } else {

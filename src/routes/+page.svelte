@@ -230,7 +230,7 @@
           <p class="text-gray-600">个性化表情包，让聊天更有趣</p>
         </div>
       </div>
-      <a href="/emoji-master" class="text-yellow-600 hover:text-yellow-700 font-medium">查看更多 →</a>
+                  <a href="/emoji-gallery" class="text-yellow-600 hover:text-yellow-700 font-medium">查看更多 →</a>
     </div>
     <div class="relative overflow-hidden">
       <div class="flex overflow-x-auto recommendation-scroll gap-6 pb-4">

@@ -12,7 +12,7 @@ type EnsureDefined<T> = T extends null | undefined ? {} : T;
 type OptionalUnion<U extends Record<string, any>, A extends keyof U = U extends U ? keyof U : never> = U extends unknown ? { [P in Exclude<A, keyof U>]?: never } & U : never;
 export type Snapshot<T = any> = Kit.Snapshot<T>;
 type PageParentData = EnsureDefined<LayoutData>;
-type LayoutRouteId = RouteId | "/" | "/about" | "/admin" | "/admin/customer-service" | "/admin/database" | "/admin/product-manager" | "/clear-storage" | "/dashboard" | "/emoji-master" | "/help-feedback" | "/login" | "/me" | "/my-works" | "/orders" | "/photo-gallery" | "/photo-to-image" | "/register" | "/shop" | "/showcase" | "/test-douban-api" | "/test-images" | "/test-volcano-cv" | null
+type LayoutRouteId = RouteId | "/" | "/about" | "/admin" | "/admin/customer-service" | "/admin/database" | "/admin/emoji-stats" | "/admin/product-manager" | "/auth-debug" | "/auth-test" | "/clear-storage" | "/dashboard" | "/emoji-gallery" | "/emoji-master" | "/help-feedback" | "/login" | "/me" | "/my-works" | "/orders" | "/photo-gallery" | "/photo-to-image" | "/register" | "/shop" | "/showcase" | "/test-douban-api" | "/test-images" | "/test-volcano-cv" | null
 type LayoutParams = RouteParams & {  }
 type LayoutParentData = EnsureDefined<{}>;
 

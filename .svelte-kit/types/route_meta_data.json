@@ -4,6 +4,7 @@
 	"/admin": [],
 	"/admin/customer-service": [],
 	"/admin/database": [],
+	"/admin/emoji-stats": [],
 	"/admin/product-manager": [],
 	"/api/admin/customer-service/orders": [
 		"src/routes/api/admin/customer-service/orders/+server.ts"
@@ -16,6 +17,9 @@
 	],
 	"/api/admin/database/[table]": [
 		"src/routes/api/admin/database/[table]/+server.ts"
+	],
+	"/api/admin/emoji-stats": [
+		"src/routes/api/admin/emoji-stats/+server.ts"
 	],
 	"/api/admin/product-manager/dashboard": [
 		"src/routes/api/admin/product-manager/dashboard/+server.ts"
@@ -47,6 +51,12 @@
 	"/api/douban-test": [
 		"src/routes/api/douban-test/+server.ts"
 	],
+	"/api/emoji-generation": [
+		"src/routes/api/emoji-generation/+server.ts"
+	],
+	"/api/emoji-save": [
+		"src/routes/api/emoji-save/+server.ts"
+	],
 	"/api/image-generation": [
 		"src/routes/api/image-generation/+server.ts"
 	],
@@ -65,8 +75,11 @@
 	"/api/volcano-cv": [
 		"src/routes/api/volcano-cv/+server.ts"
 	],
+	"/auth-debug": [],
+	"/auth-test": [],
 	"/clear-storage": [],
 	"/dashboard": [],
+	"/emoji-gallery": [],
 	"/emoji-master": [],
 	"/help-feedback": [],
 	"/login": [],

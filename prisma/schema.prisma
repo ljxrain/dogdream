@@ -8,22 +8,23 @@ datasource db {
 }
 
 model User {
-  id        String     @id @default(cuid())
-  email     String     @unique
-  name      String?
-  password  String
-  phone     String?
-  address   String?
-  city      String?
-  province  String?
-  avatarUrl String?
-  role      String     @default("USER")
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  creations Creation[]
-  likes     Like[]
-  orders    Order[]
-  shares    Share[]
+  id               String            @id @default(cuid())
+  email            String            @unique
+  name             String?
+  password         String
+  phone            String?
+  address          String?
+  city             String?
+  province         String?
+  avatarUrl        String?
+  role             String            @default("USER")
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  creations        Creation[]
+  likes            Like[]
+  orders           Order[]
+  shares           Share[]
+  emojiGenerations EmojiGeneration[]
 
   @@map("users")
 }
@@ -177,4 +178,23 @@ model RegionStats {
 
   @@unique([province, city, month])
   @@map("region_stats")
+}
+
+model EmojiGeneration {
+  id             String   @id @default(cuid())
+  userId         String
+  emojiType      String   // 表情包类型：情感表达、问候交流等
+  style          String   // 制作风格：卡通风格、真实风格等
+  originalImage  String   // 原始图片的base64或URL
+  generatedEmoji String   // 生成的表情包URL
+  analysis       String   // 豆包对原图的分析结果
+  prompt         String   // 生成表情包的完整提示词
+  isPublic       Boolean  @default(true)  // 是否公开展示
+  isSaved        Boolean  @default(false) // 是否保存到用户作品库
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  user           User     @relation(fields: [userId], references: [id])
+
+  @@map("emoji_generations")
 }

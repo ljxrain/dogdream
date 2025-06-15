@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs';
 import { prisma } from '$lib/prisma';
 
 // 从环境变量获取JWT密钥
-const JWT_SECRET = process.env.JWT_SECRET || 'default-secret-key';
+const JWT_SECRET = process.env.JWT_SECRET || 'dream-home-super-secret-jwt-key-2024';
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
 
 export interface UserPayload {

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
+  import { user, isLoggedIn } from '$lib/stores/auth';
   
   let registerForm = {
     account: '', // 支持邮箱或手机号
@@ -15,6 +16,12 @@
   let countdown = 0;
   let countdownTimer: number;
   let accountType: 'email' | 'phone' | 'unknown' = 'unknown';
+  
+  // 检查是否已登录，如果已登录则重定向
+  $: if ($isLoggedIn && $user) {
+    console.log('👤 用户已登录，重定向到首页');
+    goto('/');
+  }
   
   // 智能检测输入类型
   function detectAccountType(value: string): 'email' | 'phone' | 'unknown' {

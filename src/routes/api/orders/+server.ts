@@ -2,24 +2,58 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { prisma } from '$lib/prisma';
 import jwt from 'jsonwebtoken';
-import { JWT_SECRET } from '$env/static/private';
+
+// 使用硬编码的JWT密钥，与start-simple.ps1中的保持一致
+const JWT_SECRET = 'dream-home-super-secret-jwt-key-2024';
+
+// 验证用户认证的辅助函数
+async function verifyAuth(request: Request) {
+  // 优先检查cookie中的token
+  const cookies = request.headers.get('cookie');
+  let token = null;
+  
+  if (cookies) {
+    const authCookie = cookies.split(';').find(c => c.trim().startsWith('auth-token='));
+    if (authCookie) {
+      token = authCookie.split('=')[1];
+    }
+  }
+  
+  // 如果cookie中没有token，检查Authorization头
+  if (!token) {
+    const authHeader = request.headers.get('authorization');
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      token = authHeader.substring(7);
+    }
+  }
+  
+  if (!token) {
+    throw new Error('未提供认证令牌');
+  }
+  
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET) as { id: string; userId?: string };
+    // 兼容不同的JWT payload格式
+    const userId = decoded.id || decoded.userId;
+    if (!userId) {
+      throw new Error('无效的token格式');
+    }
+    return userId;
+  } catch (error) {
+    throw new Error('无效的认证令牌');
+  }
+}
 
 // 获取用户订单列表
 export const GET: RequestHandler = async ({ request, url }) => {
   try {
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return json({ error: '未提供认证令牌' }, { status: 401 });
-    }
-
-    const token = authHeader.substring(7);
-    const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
+    const userId = await verifyAuth(request);
 
     const page = parseInt(url.searchParams.get('page') || '1');
     const limit = parseInt(url.searchParams.get('limit') || '10');
     const status = url.searchParams.get('status');
 
-    const where: any = { userId: decoded.userId };
+    const where: any = { userId };
     if (status) {
       where.status = status;
     }
@@ -63,6 +97,9 @@ export const GET: RequestHandler = async ({ request, url }) => {
 
   } catch (error) {
     console.error('获取订单列表失败:', error);
+    if (error instanceof Error && error.message.includes('认证')) {
+      return json({ error: error.message }, { status: 401 });
+    }
     return json({ error: '获取订单列表失败' }, { status: 500 });
   }
 };
@@ -70,13 +107,7 @@ export const GET: RequestHandler = async ({ request, url }) => {
 // 创建新订单
 export const POST: RequestHandler = async ({ request }) => {
   try {
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return json({ error: '未提供认证令牌' }, { status: 401 });
-    }
-
-    const token = authHeader.substring(7);
-    const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
+    const userId = await verifyAuth(request);
 
     const {
       productName,
@@ -121,7 +152,7 @@ export const POST: RequestHandler = async ({ request }) => {
         productName,
         customPreviewUrl,
         customNotes,
-        userId: decoded.userId,
+        userId,
         orderItems: {
           create: {
             quantity: 1,
@@ -187,6 +218,9 @@ export const POST: RequestHandler = async ({ request }) => {
 
   } catch (error) {
     console.error('创建订单失败:', error);
+    if (error instanceof Error && error.message.includes('认证')) {
+      return json({ error: error.message }, { status: 401 });
+    }
     return json({ error: '创建订单失败' }, { status: 500 });
   }
 }; 

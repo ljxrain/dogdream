@@ -1,125 +1,295 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  
-  let selectedCategory = 'all';
-  let searchQuery = '';
-  let sortBy = 'likes';
-  
-  const categories = [
-    { id: 'all', name: '全部表情包', count: 50 },
-    { id: 'character', name: '人物表情', count: 15 },
-    { id: 'animal', name: '萌宠表情', count: 12 },
-    { id: 'animated', name: '动态表情', count: 8 },
-    { id: 'text', name: '文字表情', count: 10 },
-    { id: 'funny', name: '搞笑表情', count: 5 }
+  import { goto } from '$app/navigation';
+  import { browser } from '$app/environment';
+  import { user, isLoggedIn, initializeAuth } from '$lib/stores/auth';
+
+  let selectedImage: string | null = null;
+  let selectedEmojiType = '情感表达';
+  let selectedStyle = '卡通风格';
+  let resultImages: Array<{url: string, id: number}> = [];
+  let isGenerating = false;
+  let generationProgress = 0;
+  let generationStage = '';
+  let uploadedFile: File | null = null;
+  let dragOver = false;
+  let showLogin = false;
+  let userDescription = '';
+  let isSatisfied: boolean | null = null;
+  let savedToDatabase = false;
+
+  // 参照表情包浏览页的分类
+  const emojiTypes = [
+    { name: '情感表达', icon: '😊', description: '开心、愤怒、悲伤等情感表达' },
+    { name: '问候交流', icon: '👋', description: '打招呼、告别、感谢等交流表情' },
+    { name: '生活状态', icon: '🍕', description: '吃饭、睡觉、工作等生活状态' },
+    { name: '互动回应', icon: '👍', description: '点赞、鼓掌、比心等互动表情' },
+    { name: '搞笑娱乐', icon: '😂', description: '搞笑、幽默、卖萌等娱乐表情' },
+    { name: '节日庆祝', icon: '🎉', description: '春节、生日、情人节等节日表情' },
+    { name: '职场商务', icon: '💼', description: '职场、商务、握手等工作表情' },
+    { name: '语气辅助', icon: '🤔', description: '疑问、强调、无奈等语气表情' }
   ];
-  
-  const sortOptions = [
-    { value: 'likes', label: '按热度排序' },
-    { value: 'newest', label: '按时间排序' },
-    { value: 'downloads', label: '按下载量排序' }
+
+  // 制作风格
+  const styles = [
+    { name: '卡通风格', preview: '/styles/style1.png', description: '可爱卡通风格，色彩鲜艳' },
+    { name: '真实风格', preview: '/styles/style2.png', description: '真实照片风格，自然逼真' },
+    { name: '手绘风格', preview: '/styles/style3.png', description: '手绘插画风格，艺术感强' },
+    { name: '像素风格', preview: '/styles/style4.png', description: '复古像素风格，怀旧感' }
   ];
-  
-  // 生成50个表情包数据，使用本地图片
-  let allEmojis = Array.from({ length: 50 }, (_, i) => {
-    const imageIndex = (i % 10) + 1;
-    const categories = ['character', 'animal', 'animated', 'text', 'funny'];
-    const category = categories[i % categories.length];
-    
-    return {
-      id: i + 1,
-      title: `${getCategoryName(category)}${Math.floor(i / 5) + 1}`,
-      image: `/recommendations/emoji/emoji${imageIndex}.png`,
-      category,
-      likes: Math.floor(Math.random() * 50000) + 1000,
-      downloads: Math.floor(Math.random() * 100000) + 5000,
-      createdAt: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000),
-      author: `用户${Math.floor(Math.random() * 1000) + 1}`,
-      tags: getRandomTags(category)
-    };
+
+  onMount(async () => {
+    if (browser) {
+      await initializeAuth();
+    }
   });
-  
-  function getCategoryName(category: string): string {
-    const names = {
-      character: '人物表情包',
-      animal: '萌宠表情包',
-      animated: '动态表情包',
-      text: '文字表情包',
-      funny: '搞笑表情包'
-    };
-    return names[category] || '表情包';
+
+  $: {
+    if (browser && $isLoggedIn !== undefined) {
+      showLogin = !$isLoggedIn;
+    }
   }
-  
-  function getRandomTags(category: string): string[] {
-    const tagMap = {
-      character: ['可爱', '搞笑', '日常', '聊天'],
-      animal: ['萌宠', '狗狗', '猫咪', '治愈'],
-      animated: ['动态', '有趣', '生动', '特效'],
-      text: ['文字', '段子', '金句', '表达'],
-      funny: ['搞笑', '幽默', '沙雕', '逗比']
-    };
-    const tags = tagMap[category] || ['表情包'];
-    return tags.slice(0, Math.floor(Math.random() * 3) + 2);
+
+  function handleImageUpload(event: Event) {
+    const input = event.target;
+    // @ts-ignore
+    if (input?.files?.[0]) {
+      // @ts-ignore
+      const file = input.files[0];
+      uploadedFile = file;
+      
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (e.target?.result && typeof e.target.result === 'string') {
+          selectedImage = e.target.result;
+        }
+      };
+      reader.readAsDataURL(file);
+    }
   }
-  
-  $: filteredEmojis = allEmojis
-    .filter(emoji => {
-      const matchesCategory = selectedCategory === 'all' || emoji.category === selectedCategory;
-      const matchesSearch = searchQuery === '' || 
-        emoji.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        emoji.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
-      return matchesCategory && matchesSearch;
-    })
-    .sort((a, b) => {
-      switch (sortBy) {
-        case 'likes':
-          return b.likes - a.likes;
-        case 'newest':
-          return b.createdAt.getTime() - a.createdAt.getTime();
-        case 'downloads':
-          return b.downloads - a.downloads;
-        default:
-          return 0;
+
+  function handleDragOver(event: DragEvent) {
+    event.preventDefault();
+    dragOver = true;
+  }
+
+  function handleDragLeave(event: DragEvent) {
+    event.preventDefault();
+    dragOver = false;
+  }
+
+  function handleDrop(event: DragEvent) {
+    event.preventDefault();
+    dragOver = false;
+    
+    const files = event.dataTransfer?.files;
+    if (files?.[0]) {
+      const file = files[0];
+      uploadedFile = file;
+      
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (e.target?.result && typeof e.target.result === 'string') {
+          selectedImage = e.target.result;
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  function selectEmojiType(type: string) {
+    selectedEmojiType = type;
+  }
+
+  function selectStyle(style: string) {
+    selectedStyle = style;
+  }
+
+  async function generateEmoji() {
+    if (!selectedImage || !uploadedFile) {
+      alert('请先上传照片');
+      return;
+    }
+
+    if (showLogin) {
+      goto('/login');
+      return;
+    }
+
+    isGenerating = true;
+    generationProgress = 0;
+    generationStage = '准备制作表情包...';
+    
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
+    setTimeout(() => {
+      const resultSection = document.getElementById('result-section');
+      if (resultSection) {
+        resultSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
-    });
-  
-  function downloadEmoji(emoji: any) {
-    // 模拟下载功能
-    alert(`下载表情包: ${emoji.title}`);
+    }, 200);
+
+    try {
+      generationStage = '正在分析照片内容...';
+      generationProgress = 20;
+
+      // 创建FormData
+      const formData = new FormData();
+      formData.append('image', uploadedFile);
+      formData.append('emojiType', selectedEmojiType);
+      formData.append('style', selectedStyle);
+      formData.append('userDescription', userDescription);
+
+      // 调用表情包生成API
+      const response = await fetch('/api/emoji-generation', {
+        method: 'POST',
+        body: formData,
+        credentials: 'include'
+      });
+
+      generationStage = '正在应用表情包效果...';
+      generationProgress = 60;
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || '服务器错误');
+      }
+
+      generationStage = '正在生成表情包...';
+      generationProgress = 80;
+
+      const result = await response.json();
+      
+      if (!result.success) {
+        throw new Error(result.error || '生成失败');
+      }
+
+      // 使用真实生成的表情包
+      resultImages = [
+        { url: result.data.generatedImage, id: 1 }
+      ];
+
+      generationStage = '表情包制作完成！';
+      generationProgress = 100;
+
+      console.log('表情包生成结果:', {
+        analysis: result.data.originalAnalysis,
+        prompt: result.data.generatedPrompt,
+        image: result.data.generatedImage
+      });
+
+    } catch (error) {
+      console.error('生成失败:', error);
+      alert(`生成失败: ${error instanceof Error ? error.message : '请重试'}`);
+    } finally {
+      isGenerating = false;
+    }
   }
-  
-  function likeEmoji(emoji: any) {
-    emoji.likes += 1;
-    allEmojis = [...allEmojis]; // 触发响应式更新
+
+  async function saveToDatabase() {
+    if (!resultImages.length) return;
+    
+    try {
+      const response = await fetch('/api/emoji-save', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          emojiUrl: resultImages[0].url,
+          emojiType: selectedEmojiType,
+          style: selectedStyle
+        }),
+        credentials: 'include'
+      });
+
+      if (response.ok) {
+        savedToDatabase = true;
+        alert('表情包已保存到您的作品库！');
+      } else {
+        const error = await response.json();
+        alert(`保存失败: ${error.error}`);
+      }
+    } catch (error) {
+      console.error('保存表情包失败:', error);
+      alert('保存失败，请重试');
+    }
+  }
+
+  function downloadEmoji(imageUrl: string) {
+    const link = document.createElement('a');
+    link.href = imageUrl;
+    link.download = `表情包_${selectedEmojiType}_${Date.now()}.png`;
+    link.click();
+  }
+
+  function resetAll() {
+    selectedImage = null;
+    uploadedFile = null;
+    resultImages = [];
+    isGenerating = false;
+    generationProgress = 0;
+    generationStage = '';
+    isSatisfied = null;
+    savedToDatabase = false;
+  }
+
+  function handleImageError(e: Event) {
+    const target = e.target;
+    // @ts-ignore
+    if (target && target.src) {
+      // @ts-ignore
+      target.src = '/recommendations/emoji/emoji1.png';
+    }
   }
 </script>
 
 <svelte:head>
-  	<title>表情包大师 - 狗狗造梦家</title>
-  <meta name="description" content="个性化表情包，让聊天更有趣" />
+  <title>表情包大师 - 狗狗造梦家</title>
+  <meta name="description" content="AI智能表情包制作工具，上传照片即可生成个性化表情包" />
 </svelte:head>
 
 <style>
-  .emoji-card {
+  .upload-area {
     transition: all 0.3s ease;
   }
-  .emoji-card:hover {
+  .upload-area.drag-over {
+    border-color: #f59e0b;
+    background-color: #fef3c7;
+    transform: scale(1.02);
+  }
+  .style-card {
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+  .style-card:hover {
     transform: translateY(-4px);
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
   }
-  .category-btn {
+  .style-card.selected {
+    border-color: #f59e0b;
+    background-color: #fef3c7;
+    transform: translateY(-2px);
+  }
+  .emoji-type-card {
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+  .emoji-type-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  }
+  .emoji-type-card.selected {
+    border-color: #f59e0b;
+    background-color: #fef3c7;
+    transform: translateY(-2px);
+  }
+  .result-card {
     transition: all 0.3s ease;
   }
-  .category-btn.active {
-    background-color: #f59e0b;
-    color: white;
-    transform: scale(1.05);
-  }
-  .search-input {
-    transition: all 0.3s ease;
-  }
-  .search-input:focus {
-    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+  .result-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
   }
 </style>
 
@@ -128,143 +298,287 @@
   <section class="bg-gradient-to-r from-yellow-400 to-orange-500 text-white py-16">
     <div class="max-w-6xl mx-auto px-6 text-center">
       <h1 class="text-4xl md:text-5xl font-bold mb-6">表情包大师</h1>
-      <p class="text-xl md:text-2xl mb-8 opacity-90">个性化表情包，让聊天更有趣</p>
-      <p class="text-lg opacity-80">海量精品表情包，总有一款适合你</p>
+      <p class="text-xl md:text-2xl mb-8 opacity-90">AI智能表情包制作工具</p>
+      <p class="text-lg opacity-80">上传照片，选择类型，一键生成个性化表情包</p>
     </div>
   </section>
 
   <div class="max-w-6xl mx-auto px-6 py-12">
-    <!-- 搜索和筛选区域 -->
-    <div class="bg-white rounded-2xl p-6 shadow-lg mb-8">
-      <div class="flex flex-col lg:flex-row gap-6 items-center">
-        <!-- 搜索框 -->
-        <div class="flex-1 relative">
-          <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-          <input 
-            type="text" 
-            placeholder="搜索表情包..." 
-            bind:value={searchQuery}
-            class="search-input w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-yellow-500"
-          />
+    <!-- 步骤1: 上传照片 -->
+    <div class="bg-white rounded-2xl p-8 shadow-lg mb-8">
+      <div class="flex items-center mb-6">
+        <div class="bg-yellow-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold mr-4">1</div>
+        <h2 class="text-2xl font-bold text-gray-900">选择照片</h2>
+      </div>
+      
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- 上传区域 -->
+        <div>
+          <div 
+            class="upload-area border-2 border-dashed border-gray-300 rounded-xl p-8 text-center {dragOver ? 'drag-over' : ''}"
+            on:dragover={handleDragOver}
+            on:dragleave={handleDragLeave}
+            on:drop={handleDrop}
+          >
+            {#if selectedImage}
+              <img src={selectedImage} alt="上传的照片" class="max-w-full max-h-64 mx-auto rounded-lg shadow-md" />
+              <p class="mt-4 text-gray-600">照片已上传，可以重新选择</p>
+            {:else}
+              <i class="fas fa-cloud-upload-alt text-6xl text-gray-400 mb-4"></i>
+              <p class="text-xl font-semibold text-gray-700 mb-2">拖拽照片到这里</p>
+              <p class="text-gray-500 mb-4">或者点击下方按钮选择文件</p>
+            {/if}
+            
+            <input 
+              type="file" 
+              accept="image/*" 
+              on:change={handleImageUpload}
+              class="hidden"
+              id="image-upload"
+            />
+            <label 
+              for="image-upload" 
+              class="inline-block bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-3 rounded-lg cursor-pointer transition-colors font-medium"
+            >
+              选择照片
+            </label>
+          </div>
         </div>
-        
-        <!-- 排序选择 -->
-        <div class="flex items-center gap-4">
-          <label class="text-gray-700 font-medium">排序:</label>
-          <select bind:value={sortBy} class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-yellow-500">
-            {#each sortOptions as option}
-              <option value={option.value}>{option.label}</option>
-            {/each}
-          </select>
+
+        <!-- 使用说明 -->
+        <div class="space-y-4">
+          <h3 class="text-lg font-bold text-gray-900">使用说明</h3>
+          <div class="space-y-3">
+            <div class="flex items-start">
+              <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+              <div>
+                <p class="font-medium text-gray-800">支持格式</p>
+                <p class="text-gray-600 text-sm">JPG、PNG、WEBP等常见图片格式</p>
+              </div>
+            </div>
+            <div class="flex items-start">
+              <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+              <div>
+                <p class="font-medium text-gray-800">最佳效果</p>
+                <p class="text-gray-600 text-sm">清晰的人物照片，表情明显</p>
+              </div>
+            </div>
+            <div class="flex items-start">
+              <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+              <div>
+                <p class="font-medium text-gray-800">文件大小</p>
+                <p class="text-gray-600 text-sm">建议不超过10MB</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- 分类导航 -->
-    <div class="bg-white rounded-2xl p-6 shadow-lg mb-8">
-      <h3 class="text-lg font-bold text-gray-900 mb-4">表情包分类</h3>
-      <div class="flex flex-wrap gap-3">
-        {#each categories as category}
-          <button 
-            class="category-btn px-6 py-3 rounded-full border border-gray-300 font-medium {selectedCategory === category.id ? 'active' : 'hover:border-yellow-400'}"
-            on:click={() => selectedCategory = category.id}
+    <!-- 步骤2: 选择表情包类型 -->
+    <div class="bg-white rounded-2xl p-8 shadow-lg mb-8">
+      <div class="flex items-center mb-6">
+        <div class="bg-yellow-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold mr-4">2</div>
+        <h2 class="text-2xl font-bold text-gray-900">选择表情包类型</h2>
+      </div>
+      
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {#each emojiTypes as type}
+          <div 
+            class="emoji-type-card border-2 border-gray-200 rounded-xl p-4 text-center {selectedEmojiType === type.name ? 'selected' : ''}"
+            on:click={() => selectEmojiType(type.name)}
           >
-            {category.name}
-            <span class="ml-2 bg-gray-100 text-gray-600 text-sm px-2 py-1 rounded-full">{category.count}</span>
-          </button>
+            <div class="text-3xl mb-2">{type.icon}</div>
+            <h3 class="font-bold text-gray-900 mb-1">{type.name}</h3>
+            <p class="text-sm text-gray-600">{type.description}</p>
+          </div>
         {/each}
       </div>
     </div>
 
-    <!-- 结果统计 -->
-    <div class="flex items-center justify-between mb-6">
-      <h2 class="text-2xl font-bold text-gray-900">
-        {selectedCategory === 'all' ? '全部表情包' : categories.find(c => c.id === selectedCategory)?.name}
-      </h2>
-      <div class="text-gray-600">
-        共找到 <span class="font-semibold text-yellow-600">{filteredEmojis.length}</span> 个表情包
+    <!-- 步骤3: 选择制作风格 -->
+    <div class="bg-white rounded-2xl p-8 shadow-lg mb-8">
+      <div class="flex items-center mb-6">
+        <div class="bg-yellow-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold mr-4">3</div>
+        <h2 class="text-2xl font-bold text-gray-900">选择制作风格</h2>
+      </div>
+      
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+        {#each styles as style}
+          <div 
+            class="style-card border-2 border-gray-200 rounded-xl overflow-hidden {selectedStyle === style.name ? 'selected' : ''}"
+            on:click={() => selectStyle(style.name)}
+          >
+            <img 
+              src={style.preview} 
+              alt={style.name}
+              class="w-full h-32 object-cover"
+              on:error={handleImageError}
+            />
+            <div class="p-4">
+              <h3 class="font-bold text-gray-900 mb-1">{style.name}</h3>
+              <p class="text-sm text-gray-600">{style.description}</p>
+            </div>
+          </div>
+        {/each}
       </div>
     </div>
 
-    <!-- 表情包网格 -->
-    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-      {#each filteredEmojis as emoji}
-        <div class="emoji-card bg-white rounded-xl overflow-hidden shadow-lg">
-          <div class="relative group">
-            <img 
-              src={emoji.image} 
-              alt={emoji.title} 
-              class="w-full h-48 object-cover"
-              on:error={(e) => {
-                e.target.src = '/recommendations/emoji/emoji1.png';
-              }}
-            />
-            <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-300 flex items-center justify-center">
-              <div class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex gap-2">
-                <button 
-                  on:click={() => downloadEmoji(emoji)}
-                  class="bg-yellow-500 hover:bg-yellow-600 text-white p-2 rounded-full transition-colors"
-                  title="下载"
-                >
-                  <i class="fas fa-download"></i>
-                </button>
-                <button 
-                  on:click={() => likeEmoji(emoji)}
-                  class="bg-red-500 hover:bg-red-600 text-white p-2 rounded-full transition-colors"
-                  title="点赞"
-                >
-                  <i class="fas fa-heart"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-          
-          <div class="p-4">
-            <h4 class="font-semibold text-gray-900 mb-2 truncate">{emoji.title}</h4>
-            
-            <!-- 标签 -->
-            <div class="flex flex-wrap gap-1 mb-3">
-              {#each emoji.tags.slice(0, 2) as tag}
-                <span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full">{tag}</span>
-              {/each}
-            </div>
-            
-            <!-- 统计信息 -->
-            <div class="flex items-center justify-between text-sm text-gray-500">
-              <div class="flex items-center">
-                <i class="fas fa-heart text-red-400 mr-1"></i>
-                <span>{emoji.likes.toLocaleString()}</span>
-              </div>
-              <div class="flex items-center">
-                <i class="fas fa-download text-blue-400 mr-1"></i>
-                <span>{emoji.downloads.toLocaleString()}</span>
-              </div>
-            </div>
-            
-            <!-- 作者信息 -->
-            <div class="mt-2 text-xs text-gray-400">
-              by {emoji.author}
-            </div>
-          </div>
-        </div>
-      {/each}
+    <!-- 步骤4: 自定义描述 -->
+    <div class="bg-white rounded-2xl p-8 shadow-lg mb-8">
+      <div class="flex items-center mb-6">
+        <div class="bg-yellow-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold mr-4">4</div>
+        <h2 class="text-2xl font-bold text-gray-900">自定义描述</h2>
+        <span class="ml-3 text-sm text-gray-500">(可选)</span>
+      </div>
+      
+      <div class="max-w-2xl">
+        <label for="user-description" class="block text-sm font-medium text-gray-700 mb-2">
+          添加您的创意描述
+        </label>
+        <textarea
+          id="user-description"
+          bind:value={userDescription}
+          placeholder="例如：让表情更加夸张一些，添加一些搞笑元素，或者特定的背景色彩..."
+          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-yellow-500 resize-none"
+          rows="3"
+        ></textarea>
+        <p class="text-sm text-gray-500 mt-2">
+          <i class="fas fa-lightbulb mr-1"></i>
+          描述您希望的表情包效果，AI会根据您的描述进行个性化制作
+        </p>
+      </div>
     </div>
 
-    <!-- 空状态 -->
-    {#if filteredEmojis.length === 0}
-      <div class="text-center py-16">
-        <i class="fas fa-search text-6xl text-gray-300 mb-4"></i>
-        <h3 class="text-xl font-semibold text-gray-600 mb-2">没有找到相关表情包</h3>
-        <p class="text-gray-500">试试调整搜索关键词或选择其他分类</p>
+    <!-- 生成按钮 -->
+    <div class="text-center mb-8">
+      <button 
+        on:click={generateEmoji}
+        disabled={!selectedImage || isGenerating}
+        class="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 disabled:from-gray-400 disabled:to-gray-500 text-white px-12 py-4 rounded-xl font-bold text-lg transition-all duration-300 transform hover:scale-105 disabled:scale-100 disabled:cursor-not-allowed shadow-lg"
+      >
+        {#if isGenerating}
+          <i class="fas fa-spinner fa-spin mr-2"></i>
+          制作中...
+        {:else}
+          <i class="fas fa-magic mr-2"></i>
+          开始制作表情包
+        {/if}
+      </button>
+    </div>
+
+    <!-- 生成进度 -->
+    {#if isGenerating}
+      <div id="result-section" class="bg-white rounded-2xl p-8 shadow-lg mb-8">
+        <div class="text-center">
+          <div class="mb-6">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-yellow-100 rounded-full mb-4">
+              <i class="fas fa-cog fa-spin text-2xl text-yellow-600"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">{generationStage}</h3>
+          </div>
+          
+          <div class="max-w-md mx-auto">
+            <div class="bg-gray-200 rounded-full h-3 mb-4">
+              <div 
+                class="bg-gradient-to-r from-yellow-500 to-orange-500 h-3 rounded-full transition-all duration-500"
+                style="width: {generationProgress}%"
+              ></div>
+            </div>
+            <p class="text-gray-600">{generationProgress}% 完成</p>
+          </div>
+        </div>
       </div>
     {/if}
 
-    <!-- 加载更多按钮 -->
-    {#if filteredEmojis.length > 0}
-      <div class="text-center mt-12">
-        <button class="bg-yellow-500 hover:bg-yellow-600 text-white px-8 py-3 rounded-lg font-medium transition-colors">
-          <i class="fas fa-plus mr-2"></i>
-          加载更多表情包
+    <!-- 步骤5: 生成结果 -->
+    {#if resultImages.length > 0 && !isGenerating}
+      <div id="result-section" class="bg-white rounded-2xl p-8 shadow-lg mb-8">
+        <div class="flex items-center mb-6">
+          <div class="bg-yellow-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold mr-4">5</div>
+          <h2 class="text-2xl font-bold text-gray-900">生成结果</h2>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          {#each resultImages as image}
+            <div class="result-card bg-gray-50 rounded-xl p-4">
+              <div class="w-full aspect-square bg-white rounded-lg mb-4 flex items-center justify-center overflow-hidden">
+                <img 
+                  src={image.url} 
+                  alt="生成的表情包" 
+                  class="max-w-full max-h-full object-contain"
+                  on:error={handleImageError}
+                />
+              </div>
+              <button 
+                on:click={() => downloadEmoji(image.url)}
+                class="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-2 rounded-lg font-medium transition-colors"
+              >
+                <i class="fas fa-download mr-2"></i>
+                下载
+              </button>
+            </div>
+          {/each}
+        </div>
+
+        <!-- 满意度确认 -->
+        <div class="text-center border-t pt-8">
+          <h3 class="text-lg font-bold text-gray-900 mb-4">您对生成的表情包满意吗？</h3>
+          <div class="flex justify-center gap-4 mb-6">
+            <button 
+              on:click={() => isSatisfied = false}
+              class="px-6 py-3 border-2 border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition-colors {isSatisfied === false ? 'bg-red-50 border-red-500' : ''}"
+            >
+              <i class="fas fa-times mr-2"></i>
+              不满意，重新制作
+            </button>
+            <button 
+              on:click={() => isSatisfied = true}
+              class="px-6 py-3 border-2 border-green-300 text-green-600 rounded-lg hover:bg-green-50 transition-colors {isSatisfied === true ? 'bg-green-50 border-green-500' : ''}"
+            >
+              <i class="fas fa-check mr-2"></i>
+              满意，保存作品
+            </button>
+          </div>
+
+          {#if isSatisfied === false}
+            <button 
+              on:click={resetAll}
+              class="bg-red-500 hover:bg-red-600 text-white px-8 py-3 rounded-lg font-medium transition-colors"
+            >
+              <i class="fas fa-redo mr-2"></i>
+              重新开始制作
+            </button>
+          {:else if isSatisfied === true}
+            <button 
+              on:click={saveToDatabase}
+              disabled={savedToDatabase}
+              class="bg-green-500 hover:bg-green-600 disabled:bg-gray-400 text-white px-8 py-3 rounded-lg font-medium transition-colors disabled:cursor-not-allowed"
+            >
+              {#if savedToDatabase}
+                <i class="fas fa-check mr-2"></i>
+                已保存到作品库
+              {:else}
+                <i class="fas fa-save mr-2"></i>
+                保存到作品库
+              {/if}
+            </button>
+          {/if}
+        </div>
+      </div>
+    {/if}
+
+    <!-- 登录提示 -->
+    {#if showLogin}
+      <div class="bg-yellow-50 border border-yellow-200 rounded-2xl p-6 text-center">
+        <i class="fas fa-user-circle text-4xl text-yellow-600 mb-4"></i>
+        <h3 class="text-lg font-bold text-gray-900 mb-2">登录后使用完整功能</h3>
+        <p class="text-gray-600 mb-4">登录后可以保存作品、查看历史记录等</p>
+        <button 
+          on:click={() => goto('/login')}
+          class="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+        >
+          立即登录
         </button>
       </div>
     {/if}
