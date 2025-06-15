@@ -47,7 +47,7 @@ declare module '$env/static/private' {
 	export const DOUBAO_VISION_MODEL_ID: string;
 	export const DriverData: string;
 	export const EDITOR: string;
-	export const EFC_7576: string;
+	export const EFC_7552: string;
 	export const GIT_ASKPASS: string;
 	export const HOME: string;
 	export const HOMEDRIVE: string;
@@ -164,7 +164,7 @@ declare module '$env/dynamic/private' {
 		DOUBAO_VISION_MODEL_ID: string;
 		DriverData: string;
 		EDITOR: string;
-		EFC_7576: string;
+		EFC_7552: string;
 		GIT_ASKPASS: string;
 		HOME: string;
 		HOMEDRIVE: string;

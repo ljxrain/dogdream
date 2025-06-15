@@ -11,6 +11,71 @@
   let isGeneratingPreview = false;
   let previewError: string | null = null;
   
+  // 背景展示图片 - 使用D盘图片目录下的所有图片
+  const showcaseImages = [
+    // PNG图片
+    '/images/showcase/01a7fc26-bbf3-4a97-8458-6ea5f3cbe8a3.png',
+    '/images/showcase/05b0881c-a7e4-4e53-ad02-d60331b7328f.png',
+    '/images/showcase/0b56cd4a-bcfe-44ba-9ef8-e04c4c5213e2.png',
+    '/images/showcase/12218b6d-212f-48f3-80f7-724a00f3d64a.png',
+    '/images/showcase/15bb63e2-793e-4e31-8535-044045e2ea76.png',
+    '/images/showcase/17c8c398-207b-47f2-adb2-7b88d96b64be.png',
+    '/images/showcase/23598deb-2861-464b-a1c9-e9bde2ccd1ba.png',
+    '/images/showcase/2b087131-dbab-4893-b5d6-16dd817b5f25.png',
+    '/images/showcase/2b1fcbf0-f0fd-411a-926a-28afcf8abbab.png',
+    '/images/showcase/2fd9a258-f551-4654-8854-9084d3af4f11.png',
+    '/images/showcase/3d9e2b89-8d91-46dc-add2-1d8210266142.png',
+    '/images/showcase/4c0a1f6b-85b7-4c66-bddb-aae05faf8a6f.png',
+    '/images/showcase/563528f5-67a6-48e9-9daf-aab802e833d8.png',
+    '/images/showcase/5e239db6-74cd-4e4d-96c6-47f5d9dd5bda.png',
+    '/images/showcase/61632edc-5ec7-45ff-81d5-838af3f87474.png',
+    '/images/showcase/62ac106c-a6e5-4173-b56e-695054db6cd4.png',
+    '/images/showcase/6360ebb9-8d6c-48b1-8cb5-5bc18692ccc0.png',
+    '/images/showcase/692ab49a-f214-4ce5-94c9-0a12a180cf9b.png',
+    '/images/showcase/8202a0ef-fa95-4d31-b0f0-69b175f37efa.png',
+    '/images/showcase/85060cd9-ddd5-4f6a-a757-6a2ea1ee17fb.png',
+    '/images/showcase/874a85fb-1084-4b03-940d-6de7fb58872d.png',
+    '/images/showcase/8a368f79-d704-4218-b5fa-1abd5da082f3.png',
+    '/images/showcase/8da64f8c-6c21-407c-922b-cf91aba2ee9a.png',
+    '/images/showcase/945d6ec9-d167-485a-9d23-2b5c922bbfd4.png',
+    '/images/showcase/96edbd6b-9bc9-491a-b3ed-f7d857208f15.png',
+    '/images/showcase/a2ca431c-ff1a-4421-ba22-1120f0bd0a1c.png',
+    '/images/showcase/b12ced9c-57cd-42e9-bbb1-ffaddb1b31be.png',
+    '/images/showcase/ba32a857-6fba-408a-985c-7aae084d2ffb.png',
+    '/images/showcase/bcc592be-c621-4b61-8ee2-36ab9e941284.png',
+    '/images/showcase/bdbd88e1-dfbb-4dec-8f3c-6c05b3b3127e.png',
+    '/images/showcase/d1dc45d1-a588-44f3-8b6b-beb5a8a806b6.png',
+    '/images/showcase/dde9a9e8-0361-4fdf-84c7-1fec7b326da1.png',
+    '/images/showcase/ddebf859-7a67-44ea-8517-1e671b074e38.png',
+    '/images/showcase/dff3d8b0-805e-4393-b3a6-3edc728435dc.png',
+    '/images/showcase/e55d7912-7207-445e-9c36-8fa40210ebd2.png',
+    '/images/showcase/e80c5829-8a72-419a-9e2e-e4e77cade9c8.png',
+    '/images/showcase/e828f8d6-1476-4543-876e-01dff4392290.png',
+    '/images/showcase/ebacea81-8027-4a4e-8f4d-8e241aa35d15.png',
+    // 微信图片
+    '/images/showcase/微信图片_20250603200400.jpg',
+    '/images/showcase/微信图片_20250603200425.jpg',
+    '/images/showcase/微信图片_20250603200431.jpg',
+    '/images/showcase/微信图片_20250603200438.jpg',
+    '/images/showcase/微信图片_20250603200446.jpg',
+    '/images/showcase/微信图片_20250603200453.jpg'
+  ];
+  
+  // 创建上排和下排专用的图片数组，确保不重复
+  const topRowImages = showcaseImages; // 上排使用全部44张图片
+  const bottomRowImages = [...showcaseImages.slice(22), ...showcaseImages.slice(0, 22)]; // 下排使用全部44张图片，但是错开22张
+  
+  let currentShowcaseIndex = 0;
+  
+  // 自动轮播展示图片
+  onMount(() => {
+    const interval = setInterval(() => {
+      currentShowcaseIndex = (currentShowcaseIndex + 1) % showcaseImages.length;
+    }, 4000); // 每4秒切换一张图片
+    
+    return () => clearInterval(interval);
+  });
+  
   // 订单表单数据
   let orderForm = {
     recipientName: '',
@@ -282,16 +347,144 @@
     border-radius: 8px;
     opacity: 0.9;
   }
+  
+  /* 双排电影胶片滚动动画 */
+  @keyframes film-scroll-right {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(calc(-288px * 44));
+    }
+  }
+  
+  @keyframes film-scroll-left {
+    0% {
+      transform: translateX(calc(-288px * 44));
+    }
+    100% {
+      transform: translateX(0);
+    }
+  }
+  
+  .animate-film-scroll-right {
+    animation: film-scroll-right 480s linear infinite;
+  }
+  
+  .animate-film-scroll-left {
+    animation: film-scroll-left 560s linear infinite;
+  }
+  
+  /* 胶片播放指示器闪烁 */
+  @keyframes film-indicator {
+    0%, 50% {
+      opacity: 1;
+    }
+    51%, 100% {
+      opacity: 0.3;
+    }
+  }
 </style>
 
 <div class="min-h-screen bg-gray-50">
   <!-- Hero Section -->
-  <section class="bg-gradient-to-r from-purple-600 to-pink-600 text-white py-16">
-    <div class="max-w-6xl mx-auto px-6 text-center">
-      <h1 class="text-4xl md:text-5xl font-bold mb-6">🐾 宠物Pod定制商城</h1>
-      <p class="text-xl md:text-2xl mb-8 opacity-90">将你的爱宠印在专属商品上</p>
-      <p class="text-lg opacity-80">5步轻松定制，让爱宠陪伴你的每一天</p>
+  <section class="relative overflow-hidden min-h-screen bg-gray-900">
+    
+    <!-- 真实电影胶片背景墙 -->
+    <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+      <div class="w-full max-w-6xl h-[600px] bg-gray-800 relative overflow-hidden shadow-2xl pointer-events-none">
+        
+        <!-- 上下胶片孔洞 -->
+        <div class="absolute top-0 left-0 right-0 h-10 bg-gray-700 flex justify-around items-center z-10 pointer-events-none">
+          {#each Array(20) as _}
+            <div class="w-5 h-5 bg-gray-900 rounded-full"></div>
+          {/each}
+        </div>
+        <div class="absolute bottom-0 left-0 right-0 h-10 bg-gray-700 flex justify-around items-center z-10 pointer-events-none">
+          {#each Array(20) as _}
+            <div class="w-5 h-5 bg-gray-900 rounded-full"></div>
+          {/each}
+        </div>
+        
+        <!-- 中间分隔线 -->
+        <div class="absolute top-1/2 left-0 right-0 h-8 bg-gray-700 transform -translate-y-1/2 flex justify-around items-center z-10 pointer-events-none">
+          {#each Array(20) as _}
+            <div class="w-5 h-5 bg-gray-900 rounded-full"></div>
+          {/each}
+        </div>
+        
+        <!-- 上排胶片轨道 - 完全固定，向上移动 -->
+        <div class="absolute top-16 left-0 right-0 h-60 bg-black overflow-hidden pointer-events-none">
+          <!-- 胶片在轨道内滚动 -->
+          <div class="h-full flex animate-film-scroll-right pointer-events-none">
+            {#each topRowImages as imageUrl, index}
+              <div class="flex-shrink-0 w-72 h-full bg-gray-900 border-r-2 border-gray-600 relative pointer-events-none">
+                <div class="absolute inset-2 bg-white overflow-hidden rounded-sm">
+                  <img 
+                    src={imageUrl} 
+                    alt="宠物Pod展示{index + 1}" 
+                    class="w-full h-full object-cover"
+                  />
+                </div>
+                <div class="absolute bottom-2 left-2 text-white text-sm font-mono bg-black/80 px-2 py-1 rounded">
+                  A{String(index + 1).padStart(3, '0')}
+                </div>
+              </div>
+            {/each}
+          </div>
+        </div>
+        
+        <!-- 下排胶片轨道 - 完全固定，向上移动 -->
+        <div class="absolute bottom-16 left-0 right-0 h-60 bg-black overflow-hidden pointer-events-none">
+          <!-- 胶片在轨道内滚动 -->
+          <div class="h-full flex animate-film-scroll-left pointer-events-none">
+            {#each bottomRowImages as imageUrl, index}
+              <div class="flex-shrink-0 w-72 h-full bg-gray-900 border-r-2 border-gray-600 relative pointer-events-none">
+                <div class="absolute inset-2 bg-white overflow-hidden rounded-sm">
+                  <img 
+                    src={imageUrl} 
+                    alt="宠物Pod展示{index + 1}" 
+                    class="w-full h-full object-cover"
+                  />
+                </div>
+                <div class="absolute bottom-2 left-2 text-white text-sm font-mono bg-black/80 px-2 py-1 rounded">
+                  B{String(index + 1).padStart(3, '0')}
+                </div>
+              </div>
+            {/each}
+          </div>
+        </div>
+        
+        <!-- 胶片播放指示器 - 调整位置 -->
+        <div class="absolute top-28 left-8 w-0 h-0 border-l-10 border-l-red-500 border-t-5 border-t-transparent border-b-5 border-b-transparent animate-pulse z-20 pointer-events-none"></div>
+        <div class="absolute bottom-28 left-8 w-0 h-0 border-l-10 border-l-red-500 border-t-5 border-t-transparent border-b-5 border-b-transparent animate-pulse z-20 pointer-events-none"></div>
+        
+        <!-- 胶片信息 -->
+        <div class="absolute top-4 right-8 text-white text-lg font-mono bg-black/80 px-4 py-3 rounded z-20 pointer-events-none">
+          DUAL REEL • 35MM
+        </div>
+        
+      </div>
     </div>
+    
+    <!-- 文字内容 - 放在胶片上方 -->
+    <div class="absolute top-20 left-1/2 transform -translate-x-1/2 text-center z-10">
+      <div class="bg-white/95 backdrop-blur-sm rounded-2xl px-12 py-8 shadow-2xl">
+        <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-6">
+          铲屎官纪念狗宝宝的一生
+        </h1>
+        <button 
+          on:click={() => {
+            currentStep = 1;
+            document.querySelector('.bg-white.rounded-2xl')?.scrollIntoView({ behavior: 'smooth' });
+          }}
+          class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 px-10 rounded-full text-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+        >
+          开始定制 →
+        </button>
+      </div>
+    </div>
+    
   </section>
 
   <div class="max-w-6xl mx-auto px-6 py-12">
