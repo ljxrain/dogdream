@@ -112,23 +112,12 @@
       const result = await response.json();
       
       if (response.ok) {
-        // 登录成功，保存token到cookie
-        const cookieString = `auth-token=${result.token}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax; Secure=${location.protocol === 'https:'}`;
-        document.cookie = cookieString;
-        console.log('🍪 登录成功，设置cookie:', cookieString);
-        console.log('🍪 设置后的cookies:', document.cookie);
-        
-        // 等待一小段时间确保cookie设置完成
-        await new Promise(resolve => setTimeout(resolve, 100));
+        // 登录成功，服务器已设置cookie
+        console.log('✅ 登录成功，用户信息:', result.user);
         
         // 更新全局状态
         user.set(result.user);
         isLoggedIn.set(true);
-        console.log('✅ 登录成功，用户信息:', result.user);
-        
-        // 验证cookie是否设置成功
-        const verifyToken = document.cookie.split(';').find(c => c.trim().startsWith('auth-token='));
-        console.log('🔍 验证cookie设置:', verifyToken ? '成功' : '失败');
         
         alert('登录成功！');
         goto('/');

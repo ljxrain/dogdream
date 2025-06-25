@@ -7,9 +7,27 @@ import type { RequestHandler } from './$types';
 // 使用硬编码的JWT密钥，与start-simple.ps1中的保持一致
 const JWT_SECRET = 'dream-home-super-secret-jwt-key-2024';
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, cookies }) => {
   try {
-    const { account, accountType, loginType, code, password } = await request.json();
+    console.log('🔍 登录API被调用');
+    
+    // 获取请求体文本
+    const requestText = await request.text();
+    console.log('📝 请求体内容:', requestText);
+    
+    // 解析JSON
+    let requestData;
+    try {
+      requestData = JSON.parse(requestText);
+    } catch (parseError) {
+      console.error('❌ JSON解析错误:', parseError);
+      return json(
+        { message: 'JSON格式错误' },
+        { status: 400 }
+      );
+    }
+    
+    const { account, accountType, loginType, code, password } = requestData;
 
     // 验证输入
     if (!account || !accountType) {
@@ -109,6 +127,17 @@ export const POST: RequestHandler = async ({ request }) => {
       JWT_SECRET,
       { expiresIn: '7d' }
     );
+
+    // 设置cookie到响应头
+    cookies.set('auth-token', token, {
+      httpOnly: false, // 允许客户端JavaScript访问
+      secure: false, // 在HTTP环境下也能工作
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60, // 7天
+      path: '/'
+    });
+
+    console.log('🍪 服务端设置auth-token cookie成功');
 
     // 更新最后更新时间
     await prisma.user.update({
