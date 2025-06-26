@@ -339,40 +339,238 @@
     position: relative;
     display: inline-block;
   }
-  .pet-image-overlay {
+
+  
+  /* 胶片质感增强 - 更新为新的帧宽度 */
+  .film-strip::before {
+    content: '';
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    border-radius: 8px;
-    opacity: 0.9;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: repeating-linear-gradient(
+      90deg,
+      transparent 0px,
+      transparent 358px,
+      rgba(255,255,255,0.05) 358px,
+      rgba(255,255,255,0.05) 360px
+    );
+    pointer-events: none;
+    z-index: 2;
   }
   
-  /* 双排电影胶片滚动动画 */
-  @keyframes film-scroll-right {
+  /* 胶片老化效果 - 增强版本 */
+  .film-strip::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 20% 30%, rgba(139,69,19,0.12) 0%, transparent 60%),
+                radial-gradient(circle at 80% 70%, rgba(139,69,19,0.1) 0%, transparent 60%),
+                linear-gradient(45deg, transparent 0%, rgba(139,69,19,0.04) 40%, transparent 100%),
+                repeating-linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.02) 180px, transparent 360px);
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  /* 真实35mm电影胶片样式 - 放大版本 */
+  .film-reel-container {
+    width: 100%;
+    height: 320px; /* 从200px增加到320px */
+    overflow: hidden;
+    position: relative;
+    background: linear-gradient(180deg, #0d0d0d 0%, #1a1a1a 15%, #2d2d2d 50%, #1a1a1a 85%, #0d0d0d 100%);
+    box-shadow: inset 0 6px 12px rgba(0,0,0,0.5), 
+                inset 0 -6px 12px rgba(0,0,0,0.5),
+                0 4px 20px rgba(0,0,0,0.8);
+    border-top: 2px solid #444;
+    border-bottom: 2px solid #444;
+    border-left: 1px solid #333;
+    border-right: 1px solid #333;
+  }
+  
+  .film-strip {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: calc(360px * 88); /* 从240px增加到360px */
+    background: linear-gradient(180deg, #2a2a2a 0%, #1a1a1a 15%, #0a0a0a 25%, #000000 50%, #0a0a0a 75%, #1a1a1a 85%, #2a2a2a 100%);
+    position: relative;
+  }
+  
+  /* 胶片孔洞行 - 更逼真的设计 */
+  .film-perforations {
+    height: 36px; /* 从24px增加到36px */
+    background: linear-gradient(180deg, #1a1a1a 0%, #0d0d0d 50%, #1a1a1a 100%);
+    display: flex;
+    align-items: center;
+    border-top: 1px solid #333;
+    border-bottom: 1px solid #333;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.6);
+  }
+  
+  .film-perforations.top {
+    border-bottom: 3px solid #444;
+    box-shadow: inset 0 -3px 6px rgba(0,0,0,0.7);
+  }
+  
+  .film-perforations.bottom {
+    border-top: 3px solid #444;
+    box-shadow: inset 0 3px 6px rgba(0,0,0,0.7);
+  }
+  
+  /* 胶片孔洞 - 更真实的外观 */
+  .perforation {
+    width: 12px; /* 从8px增加到12px */
+    height: 18px; /* 从12px增加到18px */
+    background: #000;
+    margin: 0 6px; /* 从4px增加到6px */
+    border-radius: 2px;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.9), 
+                inset 0 -2px 2px rgba(255,255,255,0.1),
+                0 1px 2px rgba(0,0,0,0.8);
+    flex-shrink: 0;
+    position: relative;
+  }
+  
+  .perforation::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(135deg, #333 0%, #111 30%, #000 70%, #222 100%);
+    border-radius: 3px;
+    z-index: -1;
+  }
+  
+  .perforation::after {
+    content: '';
+    position: absolute;
+    top: 1px;
+    left: 1px;
+    right: 1px;
+    bottom: 1px;
+    background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, transparent 50%);
+    border-radius: 1px;
+    pointer-events: none;
+  }
+  
+  /* 胶片图像帧区域 */
+  .film-frames {
+    flex: 1;
+    display: flex;
+    background: linear-gradient(90deg, #000 0%, #0a0a0a 50%, #000 100%);
+    align-items: center;
+    position: relative;
+    box-shadow: inset 0 3px 6px rgba(0,0,0,0.8), 
+                inset 0 -3px 6px rgba(0,0,0,0.8);
+  }
+  
+  /* 单个胶片帧 - 更大更清晰 */
+  .film-frame {
+    width: 360px; /* 从240px增加到360px */
+    height: 248px; /* 从152px增加到248px，保持长宽比 */
+    flex-shrink: 0;
+    position: relative;
+    background: linear-gradient(135deg, #111 0%, #000 50%, #111 100%);
+    border-right: 4px solid #333; /* 从3px增加到4px */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 2px 0 4px rgba(0,0,0,0.7);
+  }
+  
+  /* 胶片帧边框 - 更真实的边框效果 */
+  .frame-border {
+    width: 330px; /* 从220px增加到330px */
+    height: 218px; /* 从132px增加到218px */
+    background: #000;
+    border: 3px solid #333; /* 从2px增加到3px */
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: inset 0 0 8px rgba(0,0,0,0.9),
+                0 2px 4px rgba(0,0,0,0.6);
+  }
+  
+  .frame-border::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, 
+                transparent 0%, 
+                rgba(255,255,255,0.03) 25%, 
+                transparent 50%, 
+                rgba(255,255,255,0.02) 75%, 
+                transparent 100%);
+    pointer-events: none;
+    z-index: 1;
+  }
+  
+  /* 胶片帧图像 - 增强的胶片效果 */
+  .frame-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: sepia(0.2) contrast(1.3) brightness(0.8) saturate(0.85) hue-rotate(-5deg);
+    transition: filter 0.3s ease, transform 0.3s ease;
+  }
+  
+  .frame-image:hover {
+    filter: sepia(0.1) contrast(1.15) brightness(0.95) saturate(1) hue-rotate(0deg);
+    transform: scale(1.02);
+  }
+  
+  /* 胶片帧编号 - 更清晰的标识 */
+  .frame-number {
+    position: absolute;
+    bottom: 6px; /* 从4px增加到6px */
+    right: 6px; /* 从4px增加到6px */
+    background: rgba(0,0,0,0.95);
+    color: #fff;
+    padding: 3px 8px; /* 从2px 6px增加到3px 8px */
+    font-family: 'Courier New', monospace;
+    font-size: 12px; /* 从10px增加到12px */
+    font-weight: bold;
+    border-radius: 3px;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.9);
+    border: 1px solid rgba(255,255,255,0.2);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.8);
+  }
+  
+  /* 胶片滚动动画 - 更新为新的帧宽度 */
+  @keyframes scroll-right {
     0% {
       transform: translateX(0);
     }
     100% {
-      transform: translateX(calc(-288px * 44));
+      transform: translateX(calc(-360px * 44)); /* 更新为新的帧宽度 */
     }
   }
   
-  @keyframes film-scroll-left {
+  @keyframes scroll-left {
     0% {
-      transform: translateX(calc(-288px * 44));
+      transform: translateX(calc(-360px * 44)); /* 更新为新的帧宽度 */
     }
     100% {
       transform: translateX(0);
     }
   }
   
-  .animate-film-scroll-right {
-    animation: film-scroll-right 480s linear infinite;
+  .animate-scroll-right {
+    animation: scroll-right 240s linear infinite;
   }
   
-  .animate-film-scroll-left {
-    animation: film-scroll-left 560s linear infinite;
+  .animate-scroll-left {
+    animation: scroll-left 280s linear infinite;
   }
   
   /* 胶片播放指示器闪烁 */
@@ -384,108 +582,102 @@
       opacity: 0.3;
     }
   }
+
+  /* 新的3区域样式 - 清理所有旧的绝对定位样式 */
 </style>
 
 <div class="min-h-screen bg-gray-50">
-  <!-- Hero Section -->
-  <section class="relative overflow-hidden min-h-screen bg-gray-900">
-    
-    <!-- 真实电影胶片背景墙 -->
-    <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-      <div class="w-full max-w-6xl h-[600px] bg-gray-800 relative overflow-hidden shadow-2xl pointer-events-none">
-        
-        <!-- 上下胶片孔洞 -->
-        <div class="absolute top-0 left-0 right-0 h-10 bg-gray-700 flex justify-around items-center z-10 pointer-events-none">
-          {#each Array(20) as _}
-            <div class="w-5 h-5 bg-gray-900 rounded-full"></div>
+  <!-- 区域1：文字区 -->
+  <div class="text-section bg-gray-900 py-16 flex flex-col items-center justify-center">
+    <div class="text-content max-w-xl w-full mx-auto text-center shadow-2xl rounded-2xl p-10 bg-white/95 backdrop-blur-sm">
+      <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-6">
+        铲屎官纪念狗宝宝的一生
+      </h1>
+      <button 
+        on:click={() => {
+          currentStep = 1;
+          document.querySelector('.bg-white.rounded-2xl')?.scrollIntoView({ behavior: 'smooth' });
+        }}
+        class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 px-10 rounded-full text-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+      >
+        开始定制 →
+      </button>
+    </div>
+  </div>
+
+  <!-- 区域2：向右滚动的真实电影胶片 -->
+  <div class="film-section-right bg-gray-900 py-8 overflow-hidden">
+    <div class="film-reel-container">
+      <div class="film-strip animate-scroll-right">
+        <!-- 胶片顶部孔洞行 -->
+        <div class="film-perforations top">
+          {#each Array(200) as _, i}
+            <div class="perforation"></div>
           {/each}
         </div>
-        <div class="absolute bottom-0 left-0 right-0 h-10 bg-gray-700 flex justify-around items-center z-10 pointer-events-none">
-          {#each Array(20) as _}
-            <div class="w-5 h-5 bg-gray-900 rounded-full"></div>
-          {/each}
-        </div>
         
-        <!-- 中间分隔线 -->
-        <div class="absolute top-1/2 left-0 right-0 h-8 bg-gray-700 transform -translate-y-1/2 flex justify-around items-center z-10 pointer-events-none">
-          {#each Array(20) as _}
-            <div class="w-5 h-5 bg-gray-900 rounded-full"></div>
-          {/each}
-        </div>
-        
-        <!-- 上排胶片轨道 - 完全固定，向上移动 -->
-        <div class="absolute top-16 left-0 right-0 h-60 bg-black overflow-hidden pointer-events-none">
-          <!-- 胶片在轨道内滚动 -->
-          <div class="h-full flex animate-film-scroll-right pointer-events-none">
-            {#each topRowImages as imageUrl, index}
-              <div class="flex-shrink-0 w-72 h-full bg-gray-900 border-r-2 border-gray-600 relative pointer-events-none">
-                <div class="absolute inset-2 bg-white overflow-hidden rounded-sm">
-                  <img 
-                    src={imageUrl} 
-                    alt="宠物Pod展示{index + 1}" 
-                    class="w-full h-full object-cover"
-                  />
-                </div>
-                <div class="absolute bottom-2 left-2 text-white text-sm font-mono bg-black/80 px-2 py-1 rounded">
-                  A{String(index + 1).padStart(3, '0')}
-                </div>
+        <!-- 胶片图像帧区域 -->
+        <div class="film-frames">
+          {#each topRowImages as imageUrl, index}
+            <div class="film-frame">
+              <div class="frame-border">
+                <img 
+                  src={imageUrl} 
+                  alt="宠物Pod展示{index + 1}" 
+                  class="frame-image"
+                />
               </div>
-            {/each}
-          </div>
+              <div class="frame-number">A{String(index + 1).padStart(3, '0')}</div>
+            </div>
+          {/each}
         </div>
         
-        <!-- 下排胶片轨道 - 完全固定，向上移动 -->
-        <div class="absolute bottom-16 left-0 right-0 h-60 bg-black overflow-hidden pointer-events-none">
-          <!-- 胶片在轨道内滚动 -->
-          <div class="h-full flex animate-film-scroll-left pointer-events-none">
-            {#each bottomRowImages as imageUrl, index}
-              <div class="flex-shrink-0 w-72 h-full bg-gray-900 border-r-2 border-gray-600 relative pointer-events-none">
-                <div class="absolute inset-2 bg-white overflow-hidden rounded-sm">
-                  <img 
-                    src={imageUrl} 
-                    alt="宠物Pod展示{index + 1}" 
-                    class="w-full h-full object-cover"
-                  />
-                </div>
-                <div class="absolute bottom-2 left-2 text-white text-sm font-mono bg-black/80 px-2 py-1 rounded">
-                  B{String(index + 1).padStart(3, '0')}
-                </div>
-              </div>
-            {/each}
-          </div>
+        <!-- 胶片底部孔洞行 -->
+        <div class="film-perforations bottom">
+          {#each Array(200) as _, i}
+            <div class="perforation"></div>
+          {/each}
         </div>
-        
-        <!-- 胶片播放指示器 - 调整位置 -->
-        <div class="absolute top-28 left-8 w-0 h-0 border-l-10 border-l-red-500 border-t-5 border-t-transparent border-b-5 border-b-transparent animate-pulse z-20 pointer-events-none"></div>
-        <div class="absolute bottom-28 left-8 w-0 h-0 border-l-10 border-l-red-500 border-t-5 border-t-transparent border-b-5 border-b-transparent animate-pulse z-20 pointer-events-none"></div>
-        
-        <!-- 胶片信息 -->
-        <div class="absolute top-4 right-8 text-white text-lg font-mono bg-black/80 px-4 py-3 rounded z-20 pointer-events-none">
-          DUAL REEL • 35MM
-        </div>
-        
       </div>
     </div>
-    
-    <!-- 文字内容 - 放在胶片上方 -->
-    <div class="absolute top-20 left-1/2 transform -translate-x-1/2 text-center z-10">
-      <div class="bg-white/95 backdrop-blur-sm rounded-2xl px-12 py-8 shadow-2xl">
-        <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-6">
-          铲屎官纪念狗宝宝的一生
-        </h1>
-        <button 
-          on:click={() => {
-            currentStep = 1;
-            document.querySelector('.bg-white.rounded-2xl')?.scrollIntoView({ behavior: 'smooth' });
-          }}
-          class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 px-10 rounded-full text-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
-        >
-          开始定制 →
-        </button>
+  </div>
+
+  <!-- 区域3：向左滚动的真实电影胶片 -->
+  <div class="film-section-left bg-gray-900 py-8 overflow-hidden">
+    <div class="film-reel-container">
+      <div class="film-strip animate-scroll-left">
+        <!-- 胶片顶部孔洞行 -->
+        <div class="film-perforations top">
+          {#each Array(200) as _, i}
+            <div class="perforation"></div>
+          {/each}
+        </div>
+        
+        <!-- 胶片图像帧区域 -->
+        <div class="film-frames">
+          {#each bottomRowImages as imageUrl, index}
+            <div class="film-frame">
+              <div class="frame-border">
+                <img 
+                  src={imageUrl} 
+                  alt="宠物Pod展示{index + 1}" 
+                  class="frame-image"
+                />
+              </div>
+              <div class="frame-number">B{String(index + 1).padStart(3, '0')}</div>
+            </div>
+          {/each}
+        </div>
+        
+        <!-- 胶片底部孔洞行 -->
+        <div class="film-perforations bottom">
+          {#each Array(200) as _, i}
+            <div class="perforation"></div>
+          {/each}
+        </div>
       </div>
     </div>
-    
-  </section>
+  </div>
 
   <div class="max-w-6xl mx-auto px-6 py-12">
     <!-- 步骤指示器 -->

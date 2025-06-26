@@ -138,6 +138,133 @@
       height: 300px;
     }
   }
+  
+  /* 胶片框效果 - 重新设计为更明显的效果 */
+  .film-strip {
+    position: relative;
+    background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
+    border-radius: 16px;
+    padding: 0;
+    box-shadow: 
+      0 25px 50px rgba(0, 0, 0, 0.6),
+      0 10px 20px rgba(0, 0, 0, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    border: 2px solid #333;
+    overflow: hidden;
+  }
+  
+  /* 胶片外框结构 */
+  .film-container {
+    background: linear-gradient(180deg, #2a2a2a 0%, #1a1a1a 15%, #0d0d0d 25%, #000 50%, #0d0d0d 75%, #1a1a1a 85%, #2a2a2a 100%);
+    padding: 40px 0;
+    position: relative;
+  }
+  
+  /* 顶部胶片孔洞条 */
+  .film-perforations-top {
+    position: absolute;
+    top: 8px;
+    left: 50px;
+    right: 50px;
+    height: 24px;
+    background: #0d0d0d;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 10px;
+    border-radius: 4px;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.8);
+  }
+  
+  /* 底部胶片孔洞条 */
+  .film-perforations-bottom {
+    position: absolute;
+    bottom: 8px;
+    left: 50px;
+    right: 50px;
+    height: 24px;
+    background: #0d0d0d;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 10px;
+    border-radius: 4px;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.8);
+  }
+  
+  /* 胶片孔洞 */
+  .film-hole {
+    width: 8px;
+    height: 12px;
+    background: #000;
+    border-radius: 2px;
+    box-shadow: 
+      inset 0 2px 4px rgba(0,0,0,0.9),
+      0 1px 2px rgba(255,255,255,0.1);
+    position: relative;
+  }
+  
+  .film-hole::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: -1px;
+    right: -1px;
+    bottom: -1px;
+    background: linear-gradient(135deg, #444 0%, #111 50%, #000 100%);
+    border-radius: 3px;
+    z-index: -1;
+  }
+  
+  /* 左右侧胶片边框 */
+  .film-side-border {
+    position: absolute;
+    top: 40px;
+    bottom: 40px;
+    width: 40px;
+    background: linear-gradient(90deg, #333 0%, #1a1a1a 50%, #0d0d0d 100%);
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.7);
+  }
+  
+  .film-side-border.left {
+    left: 0;
+    border-right: 2px solid #444;
+  }
+  
+  .film-side-border.right {
+    right: 0;
+    border-left: 2px solid #444;
+  }
+  
+  /* 胶片内容区域 */
+  .film-frame {
+    position: relative;
+    margin: 0 50px;
+    border: 4px solid #333;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #000;
+    box-shadow: 
+      inset 0 0 20px rgba(0, 0, 0, 0.8),
+      0 4px 8px rgba(0, 0, 0, 0.5);
+  }
+  
+  /* 胶片质感纹理 */
+  .film-strip::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+      radial-gradient(circle at 20% 30%, rgba(139,69,19,0.15) 0%, transparent 60%),
+      radial-gradient(circle at 80% 70%, rgba(139,69,19,0.12) 0%, transparent 60%),
+      repeating-linear-gradient(45deg, transparent 0%, rgba(255,255,255,0.02) 1px, transparent 2px),
+      repeating-linear-gradient(-45deg, transparent 0%, rgba(0,0,0,0.05) 1px, transparent 2px);
+    pointer-events: none;
+    z-index: 1;
+  }
   .recommendation-scroll {
     scroll-behavior: smooth;
   }
@@ -157,37 +284,66 @@
   }
 </style>
 
-<!-- Hero轮播图 -->
-<section class="banner-container relative overflow-hidden rounded-2xl mx-4 mt-8 mb-16">
-  {#each banners as banner, i}
-  <div class="absolute inset-0 transition-opacity duration-1000 ease-in-out {currentBanner === i ? 'opacity-100' : 'opacity-0'}">
-    <img src="{banner.img}" alt="{banner.alt}" class="w-full h-full object-cover" />
-    <div class="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent flex items-center">
-      <div class="max-w-2xl mx-auto px-8 text-white">
-        <h2 class="text-4xl md:text-6xl font-bold mb-4">{banner.title}</h2>
-        <p class="text-lg md:text-xl mb-8 opacity-90">{banner.subtitle}</p>
-        <button class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg text-lg font-medium transition-colors">
-          {banner.cta}
-        </button>
+<!-- Hero轮播图 - 胶片框效果 -->
+<section class="mx-4 mt-8 mb-16">
+  <div class="film-strip">
+    <!-- 胶片外框结构 -->
+    <div class="film-container">
+      <!-- 顶部胶片孔洞条 -->
+      <div class="film-perforations-top">
+        {#each Array(20) as _, i}
+          <div class="film-hole"></div>
+        {/each}
+      </div>
+      
+      <!-- 底部胶片孔洞条 -->
+      <div class="film-perforations-bottom">
+        {#each Array(20) as _, i}
+          <div class="film-hole"></div>
+        {/each}
+      </div>
+      
+      <!-- 左侧胶片边框 -->
+      <div class="film-side-border left"></div>
+      
+      <!-- 右侧胶片边框 -->
+      <div class="film-side-border right"></div>
+      
+      <!-- 胶片内容区域 -->
+      <div class="film-frame banner-container relative overflow-hidden">
+        {#each banners as banner, i}
+        <div class="absolute inset-0 transition-opacity duration-1000 ease-in-out {currentBanner === i ? 'opacity-100' : 'opacity-0'}">
+          <img src="{banner.img}" alt="{banner.alt}" class="w-full h-full object-cover" />
+          <div class="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent flex items-center">
+            <div class="max-w-2xl mx-auto px-8 text-white">
+              <h2 class="text-4xl md:text-6xl font-bold mb-4">{banner.title}</h2>
+              <p class="text-lg md:text-xl mb-8 opacity-90">{banner.subtitle}</p>
+              <button class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg text-lg font-medium transition-colors">
+                {banner.cta}
+              </button>
+            </div>
+          </div>
+        </div>
+        {/each}
+        
+        <!-- 轮播指示器 -->
+        <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex gap-3 z-10">
+          {#each banners as _, i}
+            <button 
+              on:click={() => setBanner(i)} 
+              class="w-3 h-3 rounded-full transition-all duration-300 {currentBanner === i ? 'bg-white scale-125' : 'bg-white/50 hover:bg-white/75'}"
+            ></button>
+          {/each}
+        </div>
       </div>
     </div>
-  </div>
-  {/each}
-  
-  <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex gap-3">
-    {#each banners as _, i}
-      <button 
-        on:click={() => setBanner(i)} 
-        class="w-3 h-3 rounded-full transition-all duration-300 {currentBanner === i ? 'bg-white scale-125' : 'bg-white/50 hover:bg-white/75'}"
-      ></button>
-    {/each}
   </div>
 </section>
 
 <!-- 核心功能展示 -->
 <section class="py-16">
   <div class="text-center mb-12">
-    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">强大的AI创作工具</h2>
+    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">🔥 强大的AI创作工具 🔥</h2>
     <p class="text-lg text-gray-600 max-w-2xl mx-auto">释放创意潜能，让AI成为你的创作伙伴</p>
   </div>
   

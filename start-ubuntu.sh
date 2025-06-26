@@ -185,14 +185,23 @@ else
     log_success "端口3000空闲"
 fi
 
-# 7. 创建必要目录
-log_step "7️⃣ 准备静态资源"
+# 7. 创建必要目录和清理临时文件
+log_step "7️⃣ 准备静态资源和清理临时文件"
 mkdir -p static/images/showcase
 mkdir -p static/recommendations/shop
-log_success "静态资源目录已准备"
+
+# 清理可能干扰热重载的Vite临时文件
+rm -f vite.config.ts.timestamp-*.mjs 2>/dev/null || true
+rm -rf .svelte-kit/generated 2>/dev/null || true
+log_success "静态资源目录已准备，临时文件已清理"
 
 # 8. 启动服务器
 log_step "8️⃣ 启动开发服务器"
+
+# 设置文件监视环境变量以改善WSL下的热重载性能
+export CHOKIDAR_USEPOLLING=true
+export CHOKIDAR_INTERVAL=100
+log_info "已启用文件轮询监视模式"
 
 echo ""
 echo -e "${GREEN}🚀 服务器启动信息${NC}"
@@ -217,5 +226,5 @@ echo -e "${GREEN}✨ 启动完成! 按 Ctrl+C 可停止服务器${NC}"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 
-# 启动Vite开发服务器
-exec node node_modules/vite/bin/vite.js dev --host 0.0.0.0 --port 3000 
+# 启动Vite开发服务器（使用npm脚本以确保热重载正常工作）
+exec npm run dev 
